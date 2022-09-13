@@ -1,10 +1,13 @@
 Input:
 	.csv : The maze where the characters are 'c'(Cell) and 'w'(Wall). The start posi
 	       tion is in the coordinate (1,2) and the target position is (maze-height, 
-	       maze-width - 1)
+	       maze-width - 1).
 Output:
-	.txt : The path from the source to the target given in the following format: Each
-	       direction can be 'R'(Right), 'L'(Left), 'U'(Up) and 'D'(Down) separated by
-	       ','.
-	       e.g
-	       R,R,R,U,L,D,D,...
+	traversing.txt : All the traversed paths while the agent is looking for the target. 
+	path.txt : The path from the source to the target.
+
+Format : 
+	 Each direction of path.txt can be 'R'(Right), 'L'(Left), 'U'(Up) and 'D'(Down) sepa
+	 rated by ','.
+	 e.g
+	 R,R,R,U,L,D,D,...

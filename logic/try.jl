@@ -8,11 +8,13 @@ struct Node
     action
 end
 
-open("files/maze_50x50.csv", "r") do maze
-    num_of_line = 0
+maze_array = []
+open("files/maze_5x5.csv", "r") do maze
     while !eof(maze)
-        current_line = readline(maze)
-        num_of_line += 1
-        println(current_line)
+        push!(maze_array, split(readline(maze), ","))
     end
+end
+
+for char in maze_array[1]
+    println(char)
 end

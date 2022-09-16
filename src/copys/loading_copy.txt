@@ -1,0 +1,1 @@
+Running in {language} the {algorithm} algorithm on the file {maze}

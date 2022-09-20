@@ -1,7 +1,8 @@
 using DataStructures
 using LinearAlgebra
+using StructEquality
 
-mutable struct Node
+@def_structequal mutable struct Node
     state
     parent
     value
@@ -9,7 +10,7 @@ mutable struct Node
 end
 
 maze_array = []
-open("files/maze_5x5.csv", "r") do maze
+open("/home/stiven/Documentos/Universidad/Inteligencia artificial/Tareas/maze_solver_iia/logic/files/maze_50x50.csv", "r") do maze
     while !eof(maze)
         push!(maze_array, split(readline(maze), ","))
     end

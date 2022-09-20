@@ -10,7 +10,7 @@ using StructEquality
 end
 
 maze_array = []
-open("/home/stiven/Documentos/Universidad/Inteligencia artificial/Tareas/maze_solver_iia/logic/files/maze_50x50.csv", "r") do maze
+open("files/maze_5x5.csv", "r") do maze
     while !eof(maze)
         push!(maze_array, split(readline(maze), ","))
     end

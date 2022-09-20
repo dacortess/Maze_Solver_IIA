@@ -103,9 +103,9 @@ DLSNode IDS(vector<vector<char>>& map, vector<pair<int, int>>& traverse, DLSNode
 int main(int argc, char **argv) {
     vector<vector<char>> map = GetMap(argv[1]);
     int maxDepth = stoi(argv[2]);
-    DLSNode start(0,1);
+    DLSNode start(0, FindCellIndex(map[0]));
+    DLSNode end(map.size() - 1, FindCellIndex(map[map.size() - 1]));
     start.depth = 0;
-    DLSNode end(map.size() - 1, map.size() - 2);
     bool failure;
     vector<pair<int,int>> traverse;
     DLSNode fin = IDS(map, traverse, start, end, maxDepth, failure);

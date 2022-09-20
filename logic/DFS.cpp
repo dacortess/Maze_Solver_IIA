@@ -40,8 +40,8 @@ Node DFS(vector<vector<char>>& map, vector<pair<int, int>>& traverse, Node start
 
 int main(int argc, char **argv) {
     vector<vector<char>> map = GetMap(argv[1]);
-    Node start(0,1);
-    Node end(map.size() - 1, map.size() - 2);
+    Node start(0, FindCellIndex(map[0]));
+    Node end(map.size() - 1, FindCellIndex(map[map.size() - 1]));
     bool failure;
     vector<pair<int,int>> traverse;
     Node fin = DFS(map, traverse, start, end, failure);

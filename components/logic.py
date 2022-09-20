@@ -80,9 +80,21 @@ class Logic():
         Returns: None
 
         """
-        #import subprocess
-        #subprocess.run(["./{script}".format(script=self.algorithm), "{file}".format(file=self.maze)])
-        pass
+        import subprocess
+        from io import StringIO
+        from sys import platform
+        from os.path import join, dirname, abspath, sep
+        from os import system
+        init_path = sep.join(dirname(abspath(__file__)).split(sep)[:-1])
+
+        if platform == 'win32':
+            path = join(init_path, 'logic', f"{self.algorithm}.exe")
+            call = subprocess.call([path + " " + self.maze])
+            print(call)
+        else:
+            #path = join(init_path, 'logic',  f"{self.algorithm}")
+            #subprocess.run([".\\" , path, self.maze])
+            pass
 
     def julia_process(self) -> None:
         """
@@ -108,10 +120,93 @@ class Logic():
         Returns: None
 
         """
-        #TODO: COMPLETE
-        return False
-    
+        from pygame.time import wait
+        wait(5000)
+        return True
+
     # UTILS
+
+    def draw_maze(self, maze, window):
+        from pygame import Rect
+        from pygame.draw import rect as draw_rect
+        
+        blockSize = int((window.height)/len(maze))
+
+        grid_x, grid_y = 0, 0
+
+        for y in range(0, window.height, blockSize):
+            grid_y = 0
+            for x in range(0, window.width-80, blockSize):
+
+                rect = Rect(x+80, y, blockSize, blockSize)
+                
+                if maze[grid_x][grid_y] == 'w': 
+                    draw_rect(window.window, "Red", rect, 100)
+                elif maze[grid_x][grid_y] == 't': 
+                    draw_rect(window.window, "Blue", rect, 100)
+                elif maze[grid_x][grid_y] == 's': 
+                    draw_rect(window.window, "Green", rect, 100)
+                else: 
+                    draw_rect(window.window, "White", rect, 100)
+                
+                grid_y += 1
+            grid_x += 1
+
+    def set_actual_cell(self, actual_cell, dir) -> None:
+        if dir == 'D':
+            return [actual_cell[0] + 1, actual_cell[1]]
+        elif dir == 'R':
+            return [actual_cell[0], actual_cell[1] + 1]
+        elif dir == 'L':
+            return [actual_cell[0], actual_cell[1] - 1]
+        else:
+            return [actual_cell[0] - 1, actual_cell[1]]
+
+    def open_maze(self) -> None:
+         
+        """
+        Read the maze file.
+
+        Args: None
+
+        Returns:
+            A List[List[str]] with the info of the maze.
+
+        """
+        with open(self.maze, encoding = 'utf-8') as f:
+            file = f.read()
+        
+        raw_maze = file.replace("\n\n","\n").strip().split('\n')
+        maze = [ row.strip().split(',') for row in raw_maze]
+
+        return maze
+
+    def open_traverse(self) -> None:
+
+        from os.path import join, dirname, abspath, sep
+        init_path = sep.join(dirname(abspath(__file__)).split(sep)[:-1])
+
+        with open(join(init_path, 'logic', 'output', 
+                        '{script}_traverse.txt'.format(script = self.algorithm)), encoding = 'utf-8') as f:
+            file = f.read()
+        
+        raw_list = file.split()
+        traverse = [(int(item.split(',')[0][1:]),  int(item.split(',')[1][:-1])) for item in raw_list]
+
+        return traverse
+
+    def open_solution(self) -> None:
+
+        from os.path import join, dirname, abspath, sep
+        init_path = sep.join(dirname(abspath(__file__)).split(sep)[:-1])
+
+        with open(join(init_path, 'logic', 'output', 
+                        '{script}_path.txt'.format(script = self.algorithm)), encoding = 'utf-8') as f:
+            file = f.read()
+        
+        solve = file.split()
+
+        return solve
 
     def open_file(self) -> None:
         """

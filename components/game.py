@@ -1,5 +1,8 @@
  # -*- coding: utf-8 -*-
 
+from config.window import Window
+
+
 class Game():
     """ Manage game."""
 
@@ -35,10 +38,6 @@ class Game():
         Returns: None
 
         """
-        from config.window import Window
-
-        self.window = Window((800, 600), "Maze Solver", self.images.background)
-        self.window.start(self.images.icon)
         self.main()
     
     def end_game(self) -> None:
@@ -56,6 +55,23 @@ class Game():
         quit()
         exit()
     
+    def create_window(self, dimentions: tuple, caption: str) -> Window:
+        """
+        Create a new game window.
+
+        Args: 
+            dimentions: A Tuple(int, int) with the dimentions of the window.
+            caption: A str with the caption of the window.
+
+        Returns: None
+
+        """
+        from config.window import Window
+        from pygame.transform import scale
+
+        self.window = Window(dimentions, caption, scale(self.images.background, (dimentions)))
+        self.window.start(self.images.icon)
+
     # MENU LOGIC
 
     def increase_step(self) -> None:
@@ -69,7 +85,7 @@ class Game():
         """
         self.step += 1
 
-    def decrease_step(self):
+    def decrease_step(self, max: bool = None):
         """
         Decrease menu state.
 
@@ -79,10 +95,24 @@ class Game():
 
         """
         self.step -= 1
+        if max: self.step = 0
 
     # BLIT SECTIONS
 
-    def blit_game_title(self):
+    def blit_background(self) -> None:
+        """
+        Blit background.
+
+        Args: None
+
+        Returns: None
+
+        """
+        from pygame.transform import scale
+
+        self.window.blit(scale(self.window.background, (self.window.width, self.window.height)), (0,0))
+
+    def blit_game_title(self) -> None:
         """
         Blit logo and title.
 
@@ -91,7 +121,7 @@ class Game():
         Returns: None
 
         """
-        self.window.blit(self.window.background, (0,0))
+        self.blit_background()
         self.window.blit(self.images.icon, (100, 10))
 
         TITLE_TEXT1 = self.font.tilte.render("MAZE", True, "#FFFFFF")
@@ -124,13 +154,13 @@ class Game():
         
         return new_buttons
     
-    def blit_back_button(self, MOUSE: tuple, is_exit: bool = None) -> None:
+    def blit_back_button(self, MOUSE: tuple, is_other: str = None) -> None:
         """
         Blit buttons.
 
         Args: 
             MOUSE: A Tuple(int, int) with the mouse position
-            is_exit: A bool that represent if button is for exit game or back to previous menu
+            is_other: A str with the text for the button
 
         Returns: None
 
@@ -138,11 +168,11 @@ class Game():
         from components.button import Button
         from pygame.transform import scale
 
-        BACK_BTN = Button(image=scale(self.images.buttons[0], (100, 50)), pos=(55,30),
-                            text_input="Back" if not is_exit else "Exit", font=self.font.text, 
+        BACK_BTN = Button(image=scale(self.images.buttons[0], (80, 40)), pos=(40,20),
+                            text_input="Back" if is_other == None else is_other, font=self.font.text, 
                             base_color="#FFFFFF", hovering_color="#FFFFFF",
-                            hovering_image=scale(self.images.buttons[2], (100, 50)))
-        
+                            hovering_image=scale(self.images.buttons[2], (80, 40)))
+
         BACK_BTN.update(self.window, MOUSE)
 
         return BACK_BTN
@@ -228,6 +258,8 @@ class Game():
         from pygame.display import update as update_display
         from pygame import QUIT, MOUSEBUTTONUP
 
+        self.create_window((800, 600), "Maze Solver")
+
         while self.step >= 0:
 
             self.blit_game_title()  
@@ -239,7 +271,7 @@ class Game():
                                                     ((600,395), "Upload Maze"))
                                         ))
             
-            EXIT_BTN = self.blit_back_button(MOUSE, True)
+            EXIT_BTN = self.blit_back_button(MOUSE, "Exit")
 
             self.clock.tick(self.window.fps)
 
@@ -367,16 +399,16 @@ class Game():
                         self.logic.set_algorithm('BFS')
                         self.set_language()
                     if BUTTONS[2].input_check(MOUSE):
-                        self.logic.set_algorithm('IDFS')
+                        self.logic.set_algorithm('DLS')
                         self.set_language()
                     if BUTTONS[3].input_check(MOUSE):
-                        self.logic.set_algorithm('UCS')
+                        self.logic.set_algorithm('DFS')
                         self.set_language()
                     if BUTTONS[4].input_check(MOUSE):
-                        self.logic.set_algorithm('GREEDY')
+                        self.logic.set_algorithm('DFS')
                         self.set_language()
                     if BUTTONS[5].input_check(MOUSE):
-                        self.logic.set_algorithm('A*')
+                        self.logic.set_algorithm('AStar')
                         self.set_language()
                     if BACK_BTN.input_check(MOUSE):
                         self.decrease_step()
@@ -423,55 +455,12 @@ class Game():
                 if event.type == MOUSEBUTTONUP and event.button == 1 and self.step == 3:
                     if BUTTONS[0].input_check(MOUSE):
                         self.logic.set_language('C++')
-                        self.loading_page()
+                        self.show_maze()
                     if BUTTONS[1].input_check(MOUSE):
                         self.logic.set_language('Julia')
-                        self.loading_page()
+                        self.show_maze()
                     if BACK_BTN.input_check(MOUSE):
                         self.decrease_step()
-
-            update_display()
-
-    def loading_page(self) -> None:
-        """
-        Show loading message while solve algorithms are running.
-
-        Args: None
-
-        Returns: None
-
-        """
-        from pygame.event import get as event_get
-        from pygame.display import update as update_display
-        from pygame import QUIT
-
-        IS_LOADING = True
-
-        if self.logic.language == 'C++': self.logic.cpp_process()
-        if self.logic.language == 'Julia': self.logic.julia_process()
-
-        while IS_LOADING:
-
-            self.blit_game_title()
-
-            LOADING_TEXT = self.font.subtitle.render("Loading...", True, "Black")
-            LOADING_RECT = LOADING_TEXT.get_rect(center=(400,300))
-
-            self.window.blit(LOADING_TEXT, LOADING_RECT)
-
-            INFO_TEXT = self.font.info.render(self.logic.read_copy('loading_copy.txt').format(
-                                            language = self.logic.language, algorithm = self.logic.algorithm, 
-                                            maze = self.logic.maze.split('\\')[-1].split('/')[-1]), True, "White")
-
-            INFO_RECT = INFO_TEXT.get_rect(center=(400,400))
-
-            self.window.blit(INFO_TEXT, INFO_RECT)
-
-            for event in event_get():
-                if event.type == QUIT:
-                    self.end_game()
-            
-            if self.logic.is_done(): IS_LOADING = False
 
             update_display()
 
@@ -537,3 +526,119 @@ class Game():
 
             update_display()
 
+    def loading_page(self) -> None:
+        """
+        Show loading message while solve algorithms are running.
+
+        Args: None
+
+        Returns: None
+
+        """
+        from pygame.event import get as event_get
+        from pygame.display import update as update_display
+        from pygame import QUIT
+
+        IS_LOADING = True
+
+        if self.logic.language == 'C++': self.logic.cpp_process()
+        if self.logic.language == 'Julia': self.logic.julia_process()
+
+        while IS_LOADING:
+
+            self.blit_game_title()
+
+            LOADING_TEXT = self.font.subtitle.render("Loading...", True, "Black")
+            LOADING_RECT = LOADING_TEXT.get_rect(center=(400,300))
+
+            self.window.blit(LOADING_TEXT, LOADING_RECT)
+
+            INFO_TEXT = self.font.info.render(self.logic.read_copy('loading_copy.txt').format(
+                                            language = self.logic.language, algorithm = self.logic.algorithm, 
+                                            maze = self.logic.maze.split('\\')[-1].split('/')[-1]), True, "White")
+
+            INFO_RECT = INFO_TEXT.get_rect(center=(400,400))
+
+            self.window.blit(INFO_TEXT, INFO_RECT)
+
+            for event in event_get():
+                if event.type == QUIT:
+                    self.end_game()
+
+            update_display()
+        
+            if self.logic.is_done(): IS_LOADING = False
+
+    def show_maze(self) -> None:
+        
+        """
+        Show maze animation.
+
+        Args: None
+
+        Returns: None
+
+        """
+        from pygame.event import get as event_get
+        from pygame.mouse import get_pos as mouse_pos
+        from pygame.display import update as update_display
+        from pygame import QUIT, MOUSEBUTTONUP
+        from config.window import Window
+
+        self.loading_page()
+
+        self.increase_step()
+
+        self.create_window((780,700), self.logic.algorithm)
+
+        maze = self.logic.open_maze()
+
+        for i in range(len(maze[0])):
+            if maze[0][i] == 'c' : actual_cell = [0,i]
+
+        traverse = self.logic.open_traverse()
+        tstep = 0
+
+        solution = self.logic.open_solution()
+        sstep = 0
+        if len(maze) <= 10:
+            TIMING = 150
+        elif len(maze) <= 50:
+            TIMING = 10
+        else: 
+            TIMING = 1
+        WAIT_TIME = 1
+
+        while self.step >= 4:
+
+            self.blit_background()
+
+            MOUSE = mouse_pos()
+            
+            HOME_BTN = self.blit_back_button(MOUSE, "Home")
+
+            self.logic.draw_maze(maze, self.window)
+
+            if WAIT_TIME%TIMING == 0:
+                if tstep < len(traverse):
+                    maze[traverse[tstep][0]][traverse[tstep][1]] = 't'
+                    tstep += 1
+                    WAIT_TIME = 0
+                elif sstep < len(solution):
+                    if sstep == 0: maze[actual_cell[0]][actual_cell[1]] = 's'
+                    actual_cell = self.logic.set_actual_cell(actual_cell, solution[sstep])
+                    maze[actual_cell[0]][actual_cell[1]] = 's'
+                    sstep += 1
+
+            WAIT_TIME += 1
+
+            for event in event_get():
+                if event.type == QUIT:
+                    self.end_game()
+                if event.type == MOUSEBUTTONUP and event.button == 1 and self.step == 4:
+                    if HOME_BTN.input_check(MOUSE):
+                        self.decrease_step(max)
+
+            update_display()
+        
+        self.create_window((800, 600), "Maze Solver")

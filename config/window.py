@@ -1,28 +1,74 @@
-import pygame, os
+ # -*- coding: utf-8 -*-
+from pygame import Surface
 
 class Window():
+    """ Manage pygame window updates."""
 
-    def __init__(self):
-        self.width, self.height = 800, 600
-        self.caption = "Maze Solver"
-        self.fps = 60
-        self.background = self.set_background()
-        self.window = pygame.display.set_mode((self.width, self.height))
+    def __init__(self, dimensions: tuple, caption: str, background: Surface) -> None:
+        """
+        Window constructor.
 
-    def start(self):
-        pygame.display.set_caption(self.caption)
-        image = pygame.image.load(os.path.join('.\src\img', 'icon.jpg'))
-        return pygame.display.set_icon(image)
+        Args:
+            dimensions: A Tuple(int, int) with the dimensions of the window.
+            caption: A str with the caption of the window.
+            background: A pyagme.Surface with the background of the window.
 
-    def set_caption(self, caption):
+        Returns:
+            None
+
+        """
+        from pygame.display import set_mode
+
+        self.width: int = dimensions[0]
+        self.height: int = dimensions[1]
+        self.caption: str = caption
+        self.fps: int = 300
+        self.background: Surface = background
+        self.window: Surface = set_mode((self.width, self.height))
+
+    # GAME INIT
+
+    def start(self, icon: Surface) -> None:
+        """
+        Init window config.
+
+        Args:
+            icon: A pyagme.Surface with the icon of the window.
+
+        Returns:
+            None
+
+        """
+        from pygame.display import set_caption, set_icon
+
+        set_caption(self.caption)
+        set_icon(icon)
+
+    def set_caption(self, caption: str) -> None:
+        """
+        Init window config.
+
+        Args:
+            icon: A pyagme.Surface with the icon of the window.
+
+        Returns:
+            None
+
+        """
         self.caption = caption
 
-    def set_background(self):
-        image = pygame.image.load(os.path.join('.\src\img', 'bg_ex.png'))
+    # WINDOW ACTUALIZATION
 
-        bg = pygame.transform.scale(image, (800, 600))
+    def blit(self, object: Surface | str, coordinates: tuple) -> None:
+        """
+        Blit objects in the window.
 
-        return bg
+        Args:
+            object: A pyagme.Surface or text to blit in the window.
+            coordinates: A Tuple(int, int) with the coordinates to blit in the window
 
-    def blit(self, object, coordinates):
+        Returns:
+            None
+
+        """
         self.window.blit(object, coordinates)

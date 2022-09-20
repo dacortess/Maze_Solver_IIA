@@ -603,7 +603,7 @@ class Game():
         sstep = 0
         if len(maze) <= 10:
             TIMING = 150
-        elif len(maze) <= 50:
+        elif len(maze) <= 30:
             TIMING = 10
         else: 
             TIMING = 1
@@ -620,7 +620,7 @@ class Game():
             self.logic.draw_maze(maze, self.window)
 
             if WAIT_TIME%TIMING == 0:
-                if tstep < len(traverse) and len(maze) <= 100:
+                if tstep < len(traverse) and len(maze) <= 50:
                     maze[traverse[tstep][0]][traverse[tstep][1]] = 't'
                     tstep += 1
                     WAIT_TIME = 0

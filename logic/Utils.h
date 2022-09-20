@@ -74,6 +74,17 @@ vector<vector<char>> GetMap(string mazeName){
     return map;
 }
 
+int FindCellIndex(vector<char> row){
+    for(int i = 0; i < row.size(); i++){
+        if (row[i] == 'c'){
+            return i;
+        }
+    }
+
+    cout << "NOT FOUND OPEN CELL \n";
+    return 0;
+}
+
 void WriteSolutionPath(vector<char> path, string name){
     ofstream solutionPath;
     solutionPath.open("output/" + name + ".txt");

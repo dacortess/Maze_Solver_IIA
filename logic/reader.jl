@@ -1,7 +1,7 @@
 using DataStructures
 using LinearAlgebra
 
-struct Node
+mutable struct Node
     state
     parent
     value
@@ -15,6 +15,3 @@ open("files/maze_5x5.csv", "r") do maze
     end
 end
 
-for char in maze_array[1]
-    println(char)
-end

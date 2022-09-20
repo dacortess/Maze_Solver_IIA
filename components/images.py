@@ -1,8 +1,10 @@
  # -*- coding: utf-8 -*-
-from os.path import join
+from os.path import join, dirname, abspath, sep
 from pygame.transform import scale
 from pygame.image import load
 from pygame import Surface
+
+init_path = sep.join(dirname(abspath(__file__)).split(sep)[:-1])
 
 class Images():
     """ Manage image uploads accross pygame methods."""
@@ -32,9 +34,9 @@ class Images():
             A Tuple(Surface, Surface, Surface) with the 3 types of buttons.
 
         """
-        return (load(join('.\src', 'img', 'button', 'button1.png')),
-                load(join('.\src', 'img', 'button', 'button2.png')),
-                load(join('.\src', 'img', 'button', 'button3.png')))
+        return (load(join(init_path, 'src', 'img', 'button', 'button1.png')),
+                load(join(init_path, 'src', 'img', 'button', 'button2.png')),
+                load(join(init_path, 'src', 'img', 'button', 'button3.png')))
     
     def get_background(self) -> Surface:
         """
@@ -46,7 +48,7 @@ class Images():
             A pygame.Surface with de background loaded.
 
         """
-        return scale(load(join('.\src', 'img', 'bg', 'bg_deg.jpg')), (800, 600))
+        return scale(load(join(init_path, 'src', 'img', 'bg', 'bg_deg.jpg')), (800, 600))
     
     def get_icon(self) -> Surface:
         """
@@ -57,7 +59,7 @@ class Images():
         Returns:
             A pygame.Surface with de icon loaded.
         """
-        return load(join('.\src', 'img', 'icon', 'icon.png'))
+        return load(join(init_path, 'src', 'img', 'icon', 'icon.png'))
 
 
 

@@ -88,9 +88,10 @@ class Logic():
         init_path = sep.join(dirname(abspath(__file__)).split(sep)[:-1])
 
         if platform == 'win32':
-            path = join(init_path, 'logic', f"{self.algorithm}.exe")
-            call = subprocess.call([path + " " + self.maze])
-            print(call)
+            #path = join(init_path, 'logic', f"{self.algorithm}.exe")
+            #call = subprocess.call([path + " " + self.maze])
+            #print(call)
+            pass
         else:
             #path = join(init_path, 'logic',  f"{self.algorithm}")
             #subprocess.run([".\\" , path, self.maze])
@@ -137,17 +138,18 @@ class Logic():
         for y in range(0, window.height, blockSize):
             grid_y = 0
             for x in range(0, window.width-80, blockSize):
-
-                rect = Rect(x+80, y, blockSize, blockSize)
                 
-                if maze[grid_x][grid_y] == 'w': 
-                    draw_rect(window.window, "Red", rect, 100)
-                elif maze[grid_x][grid_y] == 't': 
-                    draw_rect(window.window, "Blue", rect, 100)
-                elif maze[grid_x][grid_y] == 's': 
-                    draw_rect(window.window, "Green", rect, 100)
-                else: 
-                    draw_rect(window.window, "White", rect, 100)
+                if grid_x < len(maze) and grid_y < len(maze):
+                    rect = Rect(x+80, y, blockSize, blockSize)
+
+                    if maze[grid_x][grid_y] == 'w': 
+                        draw_rect(window.window, "Red", rect, 100)
+                    elif maze[grid_x][grid_y] == 't': 
+                        draw_rect(window.window, "Blue", rect, 100)
+                    elif maze[grid_x][grid_y] == 's': 
+                        draw_rect(window.window, "Green", rect, 100)
+                    else: 
+                        draw_rect(window.window, "White", rect, 100)
                 
                 grid_y += 1
             grid_x += 1

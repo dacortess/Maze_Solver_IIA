@@ -588,10 +588,10 @@ class Game():
         self.loading_page()
 
         self.increase_step()
-
-        self.create_window((780,700), self.logic.algorithm)
-
+        
         maze = self.logic.open_maze()
+
+        self.create_window((780,700) if len(maze) < 400 else (880, 800), self.logic.algorithm)
 
         for i in range(len(maze[0])):
             if maze[0][i] == 'c' : actual_cell = [0,i]
@@ -620,7 +620,7 @@ class Game():
             self.logic.draw_maze(maze, self.window)
 
             if WAIT_TIME%TIMING == 0:
-                if tstep < len(traverse):
+                if tstep < len(traverse) and len(maze) <= 100:
                     maze[traverse[tstep][0]][traverse[tstep][1]] = 't'
                     tstep += 1
                     WAIT_TIME = 0

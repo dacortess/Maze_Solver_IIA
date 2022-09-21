@@ -84,32 +84,22 @@ class Logic():
         """
         import subprocess
         from sys import platform
-        from os.path import sep
-        from os import system
+        
+        subprocess.run(['chmod', '+x','./logic/linux.sh'])
 
-        if platform == 'win32':
-            #path = join(init_path, 'logic', f"{self.algorithm}.exe")
-            #call = subprocess.call([path + " " + self.maze])
-            #print(call)
-            pass
+        if self.algorithm == 'DLS':
+            script = f'./{self.algorithm} {self.maze} {1000}'
         else:
-            subprocess.run(['chmod', '+x','./logic/linux.sh'])
+            script = f'./{self.algorithm} {self.maze}'
 
-            if self.algorithm == 'DLS':
-                script = f'./{self.algorithm} {self.maze} {1000}'
-            else:
-                script = f'./{self.algorithm} {self.maze}'
-
-            
-
-            f = open("./linux.sh", "w")
-            f.writelines([
-                    "#!/bin/bash\n",
-                    script
-                    ])
-            f.close()
-            print(f'./{self.algorithm} {self.maze}')
-            subprocess.run(['sh', './linux.sh'])
+        f = open("./linux.sh", "w")
+        f.writelines([
+                "#!/bin/bash\n",
+                script
+                ])
+        f.close()
+        print(f'./{self.algorithm} {self.maze}')
+        subprocess.run(['sh', './linux.sh'])
 
 
     def julia_process(self) -> None:

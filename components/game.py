@@ -16,7 +16,7 @@ class Game():
 
         """
         from components.font import Font
-        from components.logic import Logic
+        from logic.logic import Logic
         from components.images import Images
         from pygame.time import Clock
 
@@ -301,9 +301,11 @@ class Game():
         from pygame.mouse import get_pos as mouse_pos
         from pygame.display import update as update_display
         from pygame import QUIT, MOUSEBUTTONUP
-        from os.path import abspath
+        from os.path import abspath, sep, dirname, join
 
         self.increase_step()
+
+        init_path = sep.join(dirname(abspath(__file__)).split(sep)[:-1])
 
         while self.step >= 1:
 
@@ -331,19 +333,19 @@ class Game():
                     self.end_game()
                 if event.type == MOUSEBUTTONUP and event.button == 1 and self.step == 1:
                     if BUTTONS[0].input_check(MOUSE):
-                        self.logic.set_maze(abspath('./logic/files/maze_5x5.csv'))
+                        self.logic.set_maze(join(init_path, 'logic', 'files', 'maze_5x5.csv'))
                         self.select_algorithm()
                     if BUTTONS[1].input_check(MOUSE):
-                        self.logic.set_maze(abspath('./logic/files/maze_10x10.csv'))
+                        self.logic.set_maze(join(init_path, 'logic', 'files', 'maze_10x10.csv'))
                         self.select_algorithm()
                     if BUTTONS[2].input_check(MOUSE):
-                        self.logic.set_maze(abspath('./logic/files/maze_50x50.csv'))
+                        self.logic.set_maze(join(init_path, 'logic', 'files', 'maze_50x50.csv'))
                         self.select_algorithm()
                     if BUTTONS[3].input_check(MOUSE):
-                        self.logic.set_maze(abspath('./logic/files/maze_100x100.csv'))
+                        self.logic.set_maze(join(init_path, 'logic', 'files', 'maze_100x100.csv'))
                         self.select_algorithm()
                     if BUTTONS[4].input_check(MOUSE):
-                        self.logic.set_maze(abspath('./logic/files/maze_400x400.csv'))
+                        self.logic.set_maze(join(init_path, 'logic', 'files', 'maze_400x400.csv'))
                         self.select_algorithm()
                     if BACK_BTN.input_check(MOUSE):
                         self.decrease_step()
@@ -620,7 +622,7 @@ class Game():
             self.logic.draw_maze(maze, self.window)
 
             if WAIT_TIME%TIMING == 0:
-                if tstep < len(traverse) and len(maze) <= 50:
+                if tstep < len(traverse) and len(maze) <= 100:
                     maze[traverse[tstep][0]][traverse[tstep][1]] = 't'
                     tstep += 1
                     WAIT_TIME = 0

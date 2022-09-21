@@ -83,9 +83,8 @@ class Logic():
 
         """
         import subprocess
-        from sys import platform
         
-        subprocess.run(['chmod', '+x','./logic/linux.sh'])
+        subprocess.run(['chmod', '+x','./linux.sh'])
 
         if self.algorithm == 'DLS':
             script = f'./{self.algorithm} {self.maze} {1000}'

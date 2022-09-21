@@ -603,9 +603,8 @@ class Game():
 
         solution = self.logic.open_solution()
         sstep = 0
-        if len(maze) <= 10:
-            TIMING = 150
-        elif len(maze) <= 30:
+        
+        if len(maze) <= 30:
             TIMING = 10
         else: 
             TIMING = 1

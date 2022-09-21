@@ -1,5 +1,9 @@
  # -*- coding: utf-8 -*-
 from pygame import font as F
+from os.path import sep, dirname, abspath
+
+init_path = sep.join(dirname(abspath(__file__)).split(sep)[:-1])
+
 class Font():
     """ Manage pygame font object."""
 
@@ -30,7 +34,7 @@ class Font():
 
         """
         from os.path import join
-        return F.Font(join("./src", "font", font), size) #Ej. Adumu.ttf
+        return F.Font(join(init_path, "src", "font", font), size) #Ej. Adumu.ttf
     
     def local_font(self, font, size) -> F.Font:
         """

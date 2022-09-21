@@ -64,8 +64,10 @@ class Logic():
             A str with the content of the file
 
         """
-        from os.path import join
-        with open(join('./src/copys', file_name).replace('\\', '/'), encoding = 'utf-8') as f:
+        from os.path import join, sep, dirname, abspath
+
+        init_path = sep.join(dirname(abspath(__file__)).split(sep)[:-1])
+        with open(join(init_path, 'src', 'copys', file_name).replace('\\', '/'), encoding = 'utf-8') as f:
             file = f.read()
         return file
 
@@ -81,11 +83,9 @@ class Logic():
 
         """
         import subprocess
-        from io import StringIO
         from sys import platform
-        from os.path import join, dirname, abspath, sep
+        from os.path import sep
         from os import system
-        init_path = sep.join(dirname(abspath(__file__)).split(sep)[:-1])
 
         if platform == 'win32':
             #path = join(init_path, 'logic', f"{self.algorithm}.exe")
@@ -93,9 +93,24 @@ class Logic():
             #print(call)
             pass
         else:
-            #path = join(init_path, 'logic',  f"{self.algorithm}")
-            #subprocess.run([".\\" , path, self.maze])
-            pass
+            subprocess.run(['chmod', '+x','./logic/linux.sh'])
+
+            if self.algorithm == 'DLS':
+                script = f'./{self.algorithm} {self.maze} {1000}'
+            else:
+                script = f'./{self.algorithm} {self.maze}'
+
+            
+
+            f = open("./linux.sh", "w")
+            f.writelines([
+                    "#!/bin/bash\n",
+                    script
+                    ])
+            f.close()
+            print(f'./{self.algorithm} {self.maze}')
+            subprocess.run(['sh', './linux.sh'])
+
 
     def julia_process(self) -> None:
         """

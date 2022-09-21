@@ -3,9 +3,10 @@
 Maze solver.
 
 # Requirements
-  - Python 3.x
-  - Pygame 2.1.2
-  - Tkinter 0.1.0
+  - Python 3.x with:
+    - Pygame 2.1.2
+    - Tkinter 0.1.0
+  - python3-tk
 
 # How to play
 

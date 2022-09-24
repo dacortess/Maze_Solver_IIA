@@ -63,14 +63,13 @@ class Game():
             dimentions: A Tuple(int, int) with the dimentions of the window.
             caption: A str with the caption of the window.
 
-        Returns: None
+        Returns: A pygame.Surface with the new window
 
         """
         from config.window import Window
         from pygame.transform import scale
 
-        self.window = Window(dimentions, caption, scale(self.images.background, (dimentions)))
-        self.window.start(self.images.icon)
+        return Window(dimentions, caption, scale(self.images.background, (dimentions)))
 
     # MENU LOGIC
 
@@ -258,7 +257,8 @@ class Game():
         from pygame.display import update as update_display
         from pygame import QUIT, MOUSEBUTTONUP
 
-        self.create_window((800, 600), "Maze Solver")
+        self.window = self.create_window((800, 600), "Maze Solver")
+        self.window.start(self.images.icon)
 
         while self.step >= 0:
 
@@ -537,39 +537,27 @@ class Game():
         Returns: None
 
         """
-        from pygame.event import get as event_get
         from pygame.display import update as update_display
-        from pygame import QUIT
 
-        IS_LOADING = True
+        self.blit_game_title()
+
+        LOADING_TEXT = self.font.subtitle.render("Loading...", True, "Black")
+        LOADING_RECT = LOADING_TEXT.get_rect(center=(400,300))
+
+        self.window.blit(LOADING_TEXT, LOADING_RECT)
+
+        INFO_TEXT = self.font.info.render(self.logic.read_copy('loading_copy.txt').format(
+                                        language = self.logic.language, algorithm = self.logic.algorithm, 
+                                        maze = self.logic.maze.split('\\')[-1].split('/')[-1]), True, "White")
+
+        INFO_RECT = INFO_TEXT.get_rect(center=(400,400))
+
+        self.window.blit(INFO_TEXT, INFO_RECT)
+
+        update_display()
 
         if self.logic.language == 'C++': self.logic.cpp_process()
         if self.logic.language == 'Julia': self.logic.julia_process()
-
-        while IS_LOADING:
-
-            self.blit_game_title()
-
-            LOADING_TEXT = self.font.subtitle.render("Loading...", True, "Black")
-            LOADING_RECT = LOADING_TEXT.get_rect(center=(400,300))
-
-            self.window.blit(LOADING_TEXT, LOADING_RECT)
-
-            INFO_TEXT = self.font.info.render(self.logic.read_copy('loading_copy.txt').format(
-                                            language = self.logic.language, algorithm = self.logic.algorithm, 
-                                            maze = self.logic.maze.split('\\')[-1].split('/')[-1]), True, "White")
-
-            INFO_RECT = INFO_TEXT.get_rect(center=(400,400))
-
-            self.window.blit(INFO_TEXT, INFO_RECT)
-
-            for event in event_get():
-                if event.type == QUIT:
-                    self.end_game()
-
-            update_display()
-        
-            if self.logic.is_done(): IS_LOADING = False
 
     def show_maze(self) -> None:
         
@@ -585,7 +573,7 @@ class Game():
         from pygame.mouse import get_pos as mouse_pos
         from pygame.display import update as update_display
         from pygame import QUIT, MOUSEBUTTONUP
-        from config.window import Window
+        from pygame.transform import scale
 
         self.loading_page()
 
@@ -593,7 +581,7 @@ class Game():
         
         maze = self.logic.open_maze()
 
-        self.create_window((780,700) if len(maze) < 400 else (880, 800), self.logic.algorithm)
+        new_window = self.create_window((800,600), self.logic.algorithm)
 
         for i in range(len(maze[0])):
             if maze[0][i] == 'c' : actual_cell = [0,i]
@@ -603,11 +591,9 @@ class Game():
 
         solution = self.logic.open_solution()
         sstep = 0
-        
-        if len(maze) <= 30:
-            TIMING = 10
-        else: 
-            TIMING = 1
+
+        TIMING = 75-len(maze)*5
+        if TIMING < 0: TIMING = 1
         WAIT_TIME = 1
 
         while self.step >= 4:
@@ -618,18 +604,20 @@ class Game():
             
             HOME_BTN = self.blit_back_button(MOUSE, "Home")
 
-            self.logic.draw_maze(maze, self.window)
+            self.window.blit(new_window.window, (0,0))
 
-            if WAIT_TIME%TIMING == 0:
-                if tstep < len(traverse) and len(maze) <= 100:
+            self.logic.draw_maze(maze, new_window)
+
+            if WAIT_TIME==TIMING:
+                if tstep < len(traverse) and len(maze) <= 50:
                     maze[traverse[tstep][0]][traverse[tstep][1]] = 't'
                     tstep += 1
-                    WAIT_TIME = 0
                 elif sstep < len(solution):
                     if sstep == 0: maze[actual_cell[0]][actual_cell[1]] = 's'
                     actual_cell = self.logic.set_actual_cell(actual_cell, solution[sstep])
                     maze[actual_cell[0]][actual_cell[1]] = 's'
                     sstep += 1
+                WAIT_TIME = 0
 
             WAIT_TIME += 1
 
@@ -642,4 +630,5 @@ class Game():
 
             update_display()
         
-        self.create_window((800, 600), "Maze Solver")
+        #self.window = self.create_window((800, 600), "Maze Solver")
+        #self.window.start(self.images.icon)

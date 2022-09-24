@@ -217,7 +217,8 @@ class Logic():
             file = f.read()
         
         raw_list = file.split()
-        traverse = [(int(item.split(',')[0][1:]),  int(item.split(',')[1][:-1])) for item in raw_list]
+        solve = sorted(set(raw_list), key=lambda x:raw_list.index(x))
+        traverse = [(int(item.split(',')[0][1:]),  int(item.split(',')[1][:-1])) for item in solve]
 
         return traverse
 

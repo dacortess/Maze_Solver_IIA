@@ -113,7 +113,7 @@ class Logic():
             f = open("./linux.sh", "w")
             f.writelines([
                     "#!/bin/bash\n",
-                    f"cd {join(init_path, 'logic')}",
+                    f"cd {join(init_path, 'logic')}\n",
                     script
                     ])
             f.close()

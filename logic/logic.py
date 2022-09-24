@@ -83,22 +83,42 @@ class Logic():
 
         """
         import subprocess
-        
-        subprocess.run(['chmod', '+x','./linux.sh'])
+        from sys import platform
+        from os.path import join, dirname, abspath, sep
 
-        if self.algorithm == 'DLS':
-            script = f'./{self.algorithm} {self.maze} {1000}'
+        init_path = sep.join(dirname(abspath(__file__)).split(sep)[:-1])
+
+        if platform == 'win32':
+            if self.algorithm == 'DLS':
+                script = f'.\{self.algorithm}.exe {self.maze} {1000}'
+            else:
+                script = f'.\{self.algorithm}.exe {self.maze}'
+
+            f = open("windows.bat", "w")
+            f.writelines([
+                    f"cd {join(init_path, 'logic')}\n",
+                    script
+                    ])
+            f.close()
+            
+            subprocess.run(['windows.bat'])
         else:
-            script = f'./{self.algorithm} {self.maze}'
+            subprocess.run(['chmod', '+x','./linux.sh'])
 
-        f = open("./linux.sh", "w")
-        f.writelines([
-                "#!/bin/bash\n",
-                script
-                ])
-        f.close()
-        print(f'./{self.algorithm} {self.maze}')
-        subprocess.run(['sh', './linux.sh'])
+            if self.algorithm == 'DLS':
+                script = f'./{self.algorithm} {self.maze} {1000}'
+            else:
+                script = f'./{self.algorithm} {self.maze}'
+
+            f = open("./linux.sh", "w")
+            f.writelines([
+                    "#!/bin/bash\n",
+                    f"cd {join(init_path, 'logic')}",
+                    script
+                    ])
+            f.close()
+            
+            subprocess.run(['sh', './linux.sh'])
 
 
     def julia_process(self) -> None:

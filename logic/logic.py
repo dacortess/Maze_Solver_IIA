@@ -93,13 +93,13 @@ class Logic():
 
         if platform == 'win32':
             if self.algorithm == 'DLS':
-                script = f'.\{self.algorithm}.exe {self.maze} {10000}'
+                script = f'.\{self.algorithm}.exe {self.maze} {1000}'
             else:
                 script = f'.\{self.algorithm}.exe {self.maze}'
 
             f = open("windows.bat", "w")
             f.writelines([
-                    f"cd {join(init_path, 'logic')}\n",
+                    f"cd {join(init_path, 'logic', 'C++')}\n",
                     script
                     ])
             f.close()
@@ -116,7 +116,7 @@ class Logic():
             f = open("./linux.sh", "w")
             f.writelines([
                     "#!/bin/bash\n",
-                    f"cd {join(init_path, 'logic')}\n",
+                    f"cd {join(init_path, 'logic', 'C++')}\n",
                     script
                     ])
             f.close()
@@ -231,8 +231,8 @@ class Logic():
         from os.path import join, dirname, abspath, sep
         init_path = sep.join(dirname(abspath(__file__)).split(sep)[:-1])
 
-        with open(join(init_path, 'logic', 'output', 
-                        '{script}_traverse.txt'.format(script = self.algorithm)), encoding = 'utf-8') as f:
+        with open(join(init_path, 'logic', f'{self.language}', 'output', 
+                        f'{self.algorithm}_traverse.txt'), encoding = 'utf-8') as f:
             file = f.read()
         
         raw_list = file.split()
@@ -255,8 +255,8 @@ class Logic():
         from os.path import join, dirname, abspath, sep
         init_path = sep.join(dirname(abspath(__file__)).split(sep)[:-1])
 
-        with open(join(init_path, 'logic', 'output', 
-                        '{script}_path.txt'.format(script = self.algorithm)), encoding = 'utf-8') as f:
+        with open(join(init_path, 'logic', f'{self.language}', 'output', 
+                        f'{self.algorithm}_path.txt'), encoding = 'utf-8') as f:
             file = f.read()
         
         solve = file.split()

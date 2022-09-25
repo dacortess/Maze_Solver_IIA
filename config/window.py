@@ -22,7 +22,7 @@ class Window():
         self.width: int = dimensions[0]
         self.height: int = dimensions[1]
         self.caption: str = caption
-        self.fps: int = 300
+        self.fps: int = 120
         self.background: Surface = background
         self.window: Surface = set_mode((self.width, self.height))
 

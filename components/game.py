@@ -427,10 +427,10 @@ class Game():
                         self.logic.set_algorithm('DLS')
                         self.set_language()
                     if BUTTONS[3].input_check(MOUSE):
-                        self.logic.set_algorithm('DFS')
+                        self.logic.set_algorithm('UCS')
                         self.set_language()
                     if BUTTONS[4].input_check(MOUSE):
-                        self.logic.set_algorithm('DFS')
+                        self.logic.set_algorithm('Greedy')
                         self.set_language()
                     if BUTTONS[5].input_check(MOUSE):
                         self.logic.set_algorithm('AStar')

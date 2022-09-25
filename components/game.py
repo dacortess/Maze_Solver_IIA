@@ -605,6 +605,8 @@ class Game():
         SHOW_CONTINUE = False
         WARNING = False
 
+        IS_SAVED = False
+
         while self.step >= 4:
 
             self.blit_game_title()
@@ -613,6 +615,11 @@ class Game():
 
             INFO_TEXT = self.font.info.render("Save the image of the maze solution by clicking the following button", True, "White")
             INFO_RECT = INFO_TEXT.get_rect(center=(400,300))
+
+            WARNING_TEXT = self.font.info.render("Path Saved as img", True, "White")
+            WARNING_RECT = WARNING_TEXT.get_rect(center=(400,500))
+            
+            if IS_SAVED: self.window.blit(WARNING_TEXT, WARNING_RECT)
 
             self.window.blit(INFO_TEXT, INFO_RECT)
 
@@ -627,6 +634,7 @@ class Game():
                 if event.type == MOUSEBUTTONUP and event.button == 1 and self.step == 4:
                     if BUTTONS[0].input_check(MOUSE):
                         self.save_maze(maze, solution, actual_cell)
+                        IS_SAVED = True
                     if BUTTONS[1].input_check(MOUSE):
                         self.decrease_step(max = True)
 
@@ -684,8 +692,8 @@ class Game():
 
             MOUSE = mouse_pos()
 
-            WARNING_TEXT = self.font.subtitle.render("Path Saved as img", True, "Black")
-            WARNING_RECT = WARNING_TEXT.get_rect(center=(400,300))
+            WARNING_TEXT = self.font.info.render("Path Saved as img", True, "White")
+            WARNING_RECT = WARNING_TEXT.get_rect(center=(100,300))
             
             if IS_SAVED: self.window.blit(WARNING_TEXT, WARNING_RECT)
             
@@ -736,9 +744,12 @@ class Game():
 
         """
         from pygame.image import save
+        from pygame.transform import scale
         from os. path import join
 
-        new_window = self.create_window(((len(maze)*4),len(maze)*4), self.logic.algorithm)
+        size = (len(maze)*2)
+
+        new_window = self.create_window((size, size), self.logic.algorithm)
         sstep = 0
 
         while sstep < len(solution):
@@ -750,7 +761,7 @@ class Game():
         self.logic.draw_maze(maze, new_window, 0)
 
         save_path = self.logic.open_folder()
-        save(new_window.window, join(save_path, f"solution_with_{self.logic.algorithm}_in_maze_{len(maze)}x{len(maze)}.jpg"))
+        save(scale(new_window.window, (size*10, size*10)), join(save_path, f"solution_with_{self.logic.algorithm}_in_maze_{len(maze)}x{len(maze)}.jpg"))
         
         self.window = self.create_window((800, 600), "Maze Solver")
         self.window.start(self.images.icon)

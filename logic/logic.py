@@ -1,4 +1,7 @@
  # -*- coding: utf-8 -*-
+from config.window import Window
+
+
 class Logic():
     """ Manage maze solver logic."""
     
@@ -90,7 +93,7 @@ class Logic():
 
         if platform == 'win32':
             if self.algorithm == 'DLS':
-                script = f'.\{self.algorithm}.exe {self.maze} {1000}'
+                script = f'.\{self.algorithm}.exe {self.maze} {10000}'
             else:
                 script = f'.\{self.algorithm}.exe {self.maze}'
 
@@ -134,37 +137,33 @@ class Logic():
         #subprocess.run(["julia", "{script}.jl".format(script=self.algorithm), "{file}".format(file=self.maze)])
         pass
 
-    # SOLVER VALIDATION
+    # UTILS
 
-    def is_done(self) -> None:
+    def draw_maze(self, maze: list, window: Window, gap: int):
         """
-        Check if algorithm is done.
+        Draw the grid with the actual changes. (Steps of animation)
 
-        Args: None
+        Args:
+            maze: a List[List[str,...]] with the maze info
+            window: a pygame.Surface to blit the actual state of the maze
+            gap: int that represent the space for the buttons
 
         Returns: None
 
         """
-        from pygame.time import wait
-        wait(5000)
-        return True
-
-    # UTILS
-
-    def draw_maze(self, maze, window):
         from pygame import Rect
         from pygame.draw import rect as draw_rect
         
-        blockSize = int((window.height)/len(maze))
+        blockSize = int(window.height/len(maze))
 
         grid_x, grid_y = 0, 0
 
         for y in range(0, window.height, blockSize):
             grid_y = 0
-            for x in range(0, window.width-80, blockSize):
+            for x in range(0, window.width-gap, blockSize):
                 
                 if grid_x < len(maze) and grid_y < len(maze):
-                    rect = Rect(x+80, y, blockSize, blockSize)
+                    rect = Rect(x+gap, y, blockSize, blockSize)
 
                     if maze[grid_x][grid_y] == 'w': 
                         draw_rect(window.window, "Red", rect, 100)
@@ -178,7 +177,18 @@ class Logic():
                 grid_y += 1
             grid_x += 1
 
-    def set_actual_cell(self, actual_cell, dir) -> None:
+    def set_actual_cell(self, actual_cell: list, dir: str) -> None:
+        """
+        Set the next cell to modify.
+
+        Args:
+            maze: a List[List[str,...]] with the maze info
+            actual_cell: a List[int, int] with the top of search algorithm animation
+            dir: The direccion to turn
+
+        Returns: None
+
+        """
         if dir == 'D':
             return [actual_cell[0] + 1, actual_cell[1]]
         elif dir == 'R':
@@ -208,6 +218,15 @@ class Logic():
         return maze
 
     def open_traverse(self) -> None:
+        """
+        Read the traverse file.
+
+        Args: None
+
+        Returns:
+            A sList[str,...] with the traverse graph.
+
+        """
 
         from os.path import join, dirname, abspath, sep
         init_path = sep.join(dirname(abspath(__file__)).split(sep)[:-1])
@@ -223,6 +242,15 @@ class Logic():
         return traverse
 
     def open_solution(self) -> None:
+        """
+        Read the solution file.
+
+        Args: None
+
+        Returns:
+            A sList[str,...] with the solution path
+
+        """
 
         from os.path import join, dirname, abspath, sep
         init_path = sep.join(dirname(abspath(__file__)).split(sep)[:-1])
@@ -237,7 +265,7 @@ class Logic():
 
     def open_file(self) -> None:
         """
-        Open a filedialog.
+        Open a filedialog to select a file.
 
         Args: None
 
@@ -247,3 +275,16 @@ class Logic():
         """
         from tkinter import filedialog
         return filedialog.askopenfilename()
+    
+    def open_folder(self) -> None:
+        """
+        Open a filedialog to select a folder.
+
+        Args: None
+
+        Returns:
+            A str with the content of the file selected in the filedialog
+
+        """
+        from tkinter import filedialog
+        return filedialog.askdirectory()

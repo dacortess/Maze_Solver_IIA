@@ -153,9 +153,32 @@ class Game():
         
         return new_buttons
     
+    def blit_save_button(self, MOUSE: tuple) -> None:
+        """
+        Blit save button.
+
+        Args: 
+            MOUSE: A Tuple(int, int) with the mouse position
+            is_other: A str with the text for the button
+
+        Returns: None
+
+        """
+        from components.button import Button
+        from pygame.transform import scale
+
+        SAVE_BTN = Button(image=scale(self.images.buttons[0], (150, 80)), pos=(100,100),
+                            text_input="Save path", font=self.font.text, 
+                            base_color="#FFFFFF", hovering_color="#FFFFFF",
+                            hovering_image=scale(self.images.buttons[2], (150, 80)))
+
+        SAVE_BTN.update(self.window, MOUSE)
+
+        return SAVE_BTN
+
     def blit_back_button(self, MOUSE: tuple, is_other: str = None) -> None:
         """
-        Blit buttons.
+        Blit back button.
 
         Args: 
             MOUSE: A Tuple(int, int) with the mouse position
@@ -559,6 +582,56 @@ class Game():
         if self.logic.language == 'C++': self.logic.cpp_process()
         if self.logic.language == 'Julia': self.logic.julia_process()
 
+    def overwindow_maze(self, maze: list, solution: list, actual_cell: list):
+        
+        """
+        Show big maze save menu.
+
+        Args:
+            maze: a List[List[str,...]] with the maze info
+            solution: a List[str,...] with the solution instructions
+            actual_cell: a List[int, int] with the top of search algorithm animation
+
+        Returns: None
+
+        """
+        from pygame.event import get as event_get
+        from pygame.mouse import get_pos as mouse_pos
+        from pygame.display import update as update_display
+        from pygame import QUIT, MOUSEBUTTONUP
+
+        self.increase_step()
+
+        SHOW_CONTINUE = False
+        WARNING = False
+
+        while self.step >= 4:
+
+            self.blit_game_title()
+
+            MOUSE = mouse_pos()
+
+            INFO_TEXT = self.font.info.render("Save the image of the maze solution by clicking the following button", True, "White")
+            INFO_RECT = INFO_TEXT.get_rect(center=(400,300))
+
+            self.window.blit(INFO_TEXT, INFO_RECT)
+
+            BUTTONS = self.blit_buttons(MOUSE, self.get_big_buttons((
+                                                    ((200,395), "Save Path"),
+                                                    ((600,395), "Go Home"))
+                                        ))
+
+            for event in event_get():
+                if event.type == QUIT:
+                    self.end_game()
+                if event.type == MOUSEBUTTONUP and event.button == 1 and self.step == 4:
+                    if BUTTONS[0].input_check(MOUSE):
+                        self.save_maze(maze, solution, actual_cell)
+                    if BUTTONS[1].input_check(MOUSE):
+                        self.decrease_step(max = True)
+
+            update_display()
+
     def show_maze(self) -> None:
         
         """
@@ -573,40 +646,54 @@ class Game():
         from pygame.mouse import get_pos as mouse_pos
         from pygame.display import update as update_display
         from pygame import QUIT, MOUSEBUTTONUP
-        from pygame.transform import scale
 
         self.loading_page()
-
-        self.increase_step()
-        
-        maze = self.logic.open_maze()
-
-        new_window = self.create_window((800,600), self.logic.algorithm)
-
-        for i in range(len(maze[0])):
-            if maze[0][i] == 'c' : actual_cell = [0,i]
-
-        traverse = self.logic.open_traverse()
-        tstep = 0
 
         solution = self.logic.open_solution()
         sstep = 0
 
+        traverse = self.logic.open_traverse()
+        tstep = 0
+                
+        maze = self.logic.open_maze()
+
+        for i in range(len(maze[0])):
+            if maze[0][i] == 'c' : 
+                actual_cell = [0,i]
+                break
+        
+        bk_maze = maze.copy()
+        bk_actual_cell = actual_cell.copy()
+
+        if len(maze) > 300:
+            self.overwindow_maze(bk_maze, solution, bk_actual_cell)
+            self.decrease_step(True)
+        else:
+            self.increase_step()
+
         TIMING = 75-len(maze)*5
         if TIMING < 0: TIMING = 1
         WAIT_TIME = 1
+
+        IS_SAVED = False
+        IS_COMPLETE = False
 
         while self.step >= 4:
 
             self.blit_background()
 
             MOUSE = mouse_pos()
+
+            WARNING_TEXT = self.font.subtitle.render("Path Saved as img", True, "Black")
+            WARNING_RECT = WARNING_TEXT.get_rect(center=(400,300))
+            
+            if IS_SAVED: self.window.blit(WARNING_TEXT, WARNING_RECT)
             
             HOME_BTN = self.blit_back_button(MOUSE, "Home")
 
-            self.window.blit(new_window.window, (0,0))
+            if IS_COMPLETE: SAVE_BTN = self.blit_save_button(MOUSE)
 
-            self.logic.draw_maze(maze, new_window)
+            self.logic.draw_maze(maze, self.window, 200)
 
             if WAIT_TIME==TIMING:
                 if tstep < len(traverse) and len(maze) <= 50:
@@ -617,6 +704,8 @@ class Game():
                     actual_cell = self.logic.set_actual_cell(actual_cell, solution[sstep])
                     maze[actual_cell[0]][actual_cell[1]] = 's'
                     sstep += 1
+                else:
+                    IS_COMPLETE = True
                 WAIT_TIME = 0
 
             WAIT_TIME += 1
@@ -626,9 +715,42 @@ class Game():
                     self.end_game()
                 if event.type == MOUSEBUTTONUP and event.button == 1 and self.step == 4:
                     if HOME_BTN.input_check(MOUSE):
-                        self.decrease_step(max)
+                        self.decrease_step(max = True)
+                    if IS_COMPLETE:
+                        if SAVE_BTN.input_check(MOUSE):
+                            self.save_maze(bk_maze, solution, bk_actual_cell)
+                            IS_SAVED = True
 
             update_display()
         
-        #self.window = self.create_window((800, 600), "Maze Solver")
-        #self.window.start(self.images.icon)
+    def save_maze(self, maze, solution, actual_cell):
+        """
+        Save the maze solution to an image.
+
+        Args:
+            maze: a List[List[str,...]] with the maze info
+            solution: a List[str,...] with the solution instructions
+            actual_cell: a List[int, int]
+
+        Returns: None
+
+        """
+        from pygame.image import save
+        from os. path import join
+
+        new_window = self.create_window(((len(maze)*4),len(maze)*4), self.logic.algorithm)
+        sstep = 0
+
+        while sstep < len(solution):
+            if sstep == 0: maze[actual_cell[0]][actual_cell[1]] = 's'
+            actual_cell = self.logic.set_actual_cell(actual_cell, solution[sstep])
+            maze[actual_cell[0]][actual_cell[1]] = 's'
+            sstep += 1
+        
+        self.logic.draw_maze(maze, new_window, 0)
+
+        save_path = self.logic.open_folder()
+        save(new_window.window, join(save_path, f"solution_with_{self.logic.algorithm}_in_maze_{len(maze)}x{len(maze)}.jpg"))
+        
+        self.window = self.create_window((800, 600), "Maze Solver")
+        self.window.start(self.images.icon)

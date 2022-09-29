@@ -93,8 +93,7 @@ class Game():
         Returns: None
 
         """
-        self.step -= 1
-        if max: self.step = 0
+        self.step = 0 if max else self.step - 1
 
     # BLIT SECTIONS
 
@@ -120,14 +119,19 @@ class Game():
         Returns: None
 
         """
-        self.blit_background()
-        self.window.blit(self.images.icon, (100, 10))
+
+        # Objects config
 
         TITLE_TEXT1 = self.font.tilte.render("MAZE", True, "#FFFFFF")
         TITLE_TEXT2 = self.font.tilte.render("SOLVER", True, "#FFFFFF")
 
         TITLE_REC1 = TITLE_TEXT1.get_rect(center=(550,80))
         TITLE_REC2 = TITLE_TEXT2.get_rect(center=(550,180))
+
+        # Blit objects
+
+        self.blit_background()
+        self.window.blit(self.images.icon, (100, 10))
 
         self.window.blit(TITLE_TEXT1, TITLE_REC1)
         self.window.blit(TITLE_TEXT2, TITLE_REC2)
@@ -147,8 +151,17 @@ class Game():
         
         new_buttons = []
         for options in buttons:
+
+            # Create button
+
             BUTTON = Button(*options)
+
+            # Updates the color of the button if the mouse is over it.
+
             BUTTON.update(self.window, MOUSE)
+
+            # Save the button for future events
+
             new_buttons.append(BUTTON)
         
         return new_buttons
@@ -167,10 +180,14 @@ class Game():
         from components.button import Button
         from pygame.transform import scale
 
+        # Create button
+
         SAVE_BTN = Button(image=scale(self.images.buttons[0], (150, 80)), pos=(100,100),
-                            text_input="Save path", font=self.font.text, 
+                            text_input="Save as png", font=self.font.text, 
                             base_color="#FFFFFF", hovering_color="#FFFFFF",
                             hovering_image=scale(self.images.buttons[2], (150, 80)))
+
+        # Updates the color of the button if the mouse is over it.
 
         SAVE_BTN.update(self.window, MOUSE)
 
@@ -190,10 +207,14 @@ class Game():
         from components.button import Button
         from pygame.transform import scale
 
+        # Create button
+
         BACK_BTN = Button(image=scale(self.images.buttons[0], (80, 40)), pos=(40,20),
                             text_input="Back" if is_other == None else is_other, font=self.font.text, 
                             base_color="#FFFFFF", hovering_color="#FFFFFF",
                             hovering_image=scale(self.images.buttons[2], (80, 40)))
+        
+        # Updates the color of the button if the mouse is over it.
 
         BACK_BTN.update(self.window, MOUSE)
 
@@ -203,7 +224,7 @@ class Game():
 
     def get_big_buttons(self, options: tuple) -> tuple:
         """
-        Blit big buttons.
+        Set options for big buttons.
 
         Args: 
             options: A Tuple(Tuple(int, int), str) with the button position and text to blit
@@ -222,7 +243,7 @@ class Game():
     
     def get_medium_buttons(self, options: tuple) -> tuple:
         """
-        Blit medium buttons.
+        Set options for medium buttons.
 
         Args: 
             options: A Tuple(Tuple(int, int), str) with the button position and text to blit
@@ -244,7 +265,7 @@ class Game():
     
     def get_small_buttons(self, options: tuple) -> tuple:
         """
-        Blit small buttons.
+        Set options for small buttons.
 
         Args: 
             options: A Tuple(Tuple(int, int), str) with the button position and text to blit

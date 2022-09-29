@@ -21,6 +21,8 @@ using namespace std;
     }
 
     double GetPhysicalMemory(){
+        PROCESS_MEMORY_COUNTERS_EX pmc;
+        GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
         SIZE_T physMemUsedByMe = pmc.WorkingSetSize;
         return physMemUsedByMe;
     }

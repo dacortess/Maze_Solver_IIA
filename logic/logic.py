@@ -285,7 +285,7 @@ class Logic():
         Args: None
 
         Returns:
-            A sList[str,...] with the traverse graph.
+            A List[Tuple[(int,int)]] with the traverse graph.
 
         """
 
@@ -297,9 +297,7 @@ class Logic():
         
         raw_list = file.split()
         solve = sorted(set(raw_list), key=lambda x:raw_list.index(x))
-        traverse = [(int(item.split(',')[0][1:]),  int(item.split(',')[1][:-1])) for item in solve]
-
-        return traverse
+        return [(int(item.split(',')[0][1:]),  int(item.split(',')[1][:-1])) for item in solve]
 
     def open_solution(self) -> None:
         """
@@ -308,7 +306,7 @@ class Logic():
         Args: None
 
         Returns:
-            A sList[str,...] with the solution path
+            A List[str,...] with the solution path
 
         """
 
@@ -318,9 +316,26 @@ class Logic():
                         f'{self.algorithm}_path.txt'), encoding = 'utf-8') as f:
             file = f.read()
         
-        solve = file.split()
+        return file.split()
 
-        return solve
+    def open_stats(self) -> None:
+        """
+        Read the stats file.
+
+        Args: None
+
+        Returns:
+            A List[str,...] with the solution path
+
+        """
+
+        from os.path import join
+
+        with open(join(self.root_path(), 'logic', f'{self.language}', 'output', 
+                        f'{self.algorithm}_stats.txt'), encoding = 'utf-8') as f:
+            file = f.read()
+
+        return file.split()
 
     def open_file(self) -> None:
         """

@@ -360,7 +360,7 @@ class Game():
         from pygame.mouse import get_pos as mouse_pos
         from pygame.display import update as update_display
         from pygame import QUIT, MOUSEBUTTONUP
-        from os.path import abspath, sep, dirname, join
+        from os.path import join
 
         # Menu state
 
@@ -371,7 +371,8 @@ class Game():
         INFO_TEXT = self.font.info.render("Select the maze to evaluate", True, "White")
         INFO_RECT = INFO_TEXT.get_rect(center=(400,290))
 
-        CAUTION_TEXT = self.font.info.render("In a maze of size greater than 50, only the solution is shown", True, "White")
+        CAUTION_TEXT = self.font.info.render("In a maze of size greater than 50, only the solution is shown", 
+                                                True, "Grey")
         CAUTION_RECT = CAUTION_TEXT.get_rect(center=(400,325))
 
         BUTTONS_CONFIG = self.get_medium_buttons((  ((150,400), "Maze 5x5"),
@@ -448,7 +449,7 @@ class Game():
         #Objects config
 
         INFO_TEXT = self.font.info.render("Select the search algorithm to use", True, "White")
-        INFO_RECT = INFO_TEXT.get_rect(center=(400,300))
+        INFO_RECT = INFO_TEXT.get_rect(center=(400,325))
 
         BUTTONS_CONFIG = self.get_medium_buttons((  ((150,400), "DFS"),
                                                     ((150,500), "BFS"),
@@ -531,6 +532,9 @@ class Game():
         WARNING_TEXT = self.font.info.render("Please select a file", True, "Red")
         WARNING_RECT = WARNING_TEXT.get_rect(center=(400,335))
 
+        CAUTION_TEXT = self.font.info.render("Maze saved", True, "Green")
+        CAUTION_RECT = CAUTION_TEXT.get_rect(center=(400,335))
+
         BUTTONS_CONFIG = self.get_big_buttons(( ((400,400), "Click to upload"),
                                                 ((400,500), "Continue"))
                                             )
@@ -539,6 +543,7 @@ class Game():
 
         SHOW_CONTINUE = False
         SHOW_WARNING = False
+        SHOW_CAUTION = False
 
         while self.step >= 1:
 
@@ -558,6 +563,8 @@ class Game():
 
             if SHOW_WARNING: self.window.blit(WARNING_TEXT, WARNING_RECT)
 
+            if SHOW_CAUTION: self.window.blit(CAUTION_TEXT, CAUTION_RECT)
+
             # Event handler
 
             for event in event_get():
@@ -566,7 +573,14 @@ class Game():
                 if event.type == MOUSEBUTTONUP and event.button == 1 and self.step == 1:
                     if BUTTONS[0].input_check(MOUSE):
                         maze_file = self.logic.open_file()
-                        SHOW_CONTINUE = True if len(maze_file) > 0 else False
+                        if len(maze_file) > 0:
+                            SHOW_CONTINUE = True
+                            SHOW_CAUTION = True
+                            SHOW_WARNING = False
+                        else: 
+                            SHOW_CONTINUE = False
+                            SHOW_WARNING = True
+                            SHOW_CAUTION = False
                         self.logic.set_maze(maze_file)
                     if BUTTONS[1].input_check(MOUSE):
                         if SHOW_CONTINUE: 
@@ -643,21 +657,38 @@ class Game():
 
         self.increase_step()
 
-        # Objects config
-
-        CAUTION_TEXT = self.font.info.render("Path Saved as img", True, "White")
-        CAUTION_RECT = CAUTION_TEXT.get_rect(center=(100,300))
-
-        # Objects flags
-
-        IS_SAVED = False
-        IS_COMPLETE = False
-
         # Read algorithm results
 
         solution = self.logic.open_solution()
 
         traverse = self.logic.open_traverse()
+
+        stats = self.logic.open_stats()
+
+        # Objects config
+
+        CAUTION_TEXT = self.font.info.render("Saved", True, "Green")
+        CAUTION_RECT = CAUTION_TEXT.get_rect(center=(100,150))
+
+        MEMORY_TEXT = self.font.info.render("Used Memory:", True, "Grey")
+        MEMORY_RECT = MEMORY_TEXT.get_rect(center=(100,300))
+
+        VRAM_TEXT = self.font.info.render(f"VRAM: {stats[0]} kb", True, "Grey")
+        VRAM_RECT = VRAM_TEXT.get_rect(center=(100,340))
+
+        RAM_TEXT = self.font.info.render(f"RAM: {stats[1]} kb", True, "Grey")
+        RAM_RECT = RAM_TEXT.get_rect(center=(100,380))
+
+        TIME_TEXT = self.font.info.render("Execution Time:", True, "Grey")
+        TIME_RECT = TIME_TEXT.get_rect(center=(100,450))
+
+        EXTIME_TEXT = self.font.info.render(f"{stats[2]} ms", True, "Grey")
+        EXTIME_RECT = EXTIME_TEXT.get_rect(center=(100,480))
+
+        # Objects flags
+
+        IS_SAVED = False
+        IS_COMPLETE = False
 
         # Read maze
                 
@@ -702,6 +733,16 @@ class Game():
             if IS_SAVED: self.window.blit(CAUTION_TEXT, CAUTION_RECT)
 
             if IS_COMPLETE: SAVE_BTN = self.blit_save_button(MOUSE)
+
+            self.window.blit(MEMORY_TEXT, MEMORY_RECT)
+
+            self.window.blit(VRAM_TEXT, VRAM_RECT)
+
+            self.window.blit(RAM_TEXT, RAM_RECT)
+
+            self.window.blit(TIME_TEXT, TIME_RECT)
+
+            self.window.blit(EXTIME_TEXT, EXTIME_RECT)
 
             HOME_BTN = self.blit_back_button(MOUSE, "Home")
 

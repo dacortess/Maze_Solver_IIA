@@ -61,10 +61,14 @@ int main(int argc, char **argv) {
     Node end(map.size() - 1, FindCellIndex(map[map.size() - 1]));
     bool failure;
     vector<pair<int,int>> traverse;
+    auto startTime = std::chrono::high_resolution_clock::now();
     Node fin = AStar(map, traverse, start, end, failure);
+    auto endTime = std::chrono::high_resolution_clock::now();
+    int totalTime = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
     if(!failure){
         WriteSolutionPath(fin.path, "AStar_path");
         WriteTraverse(traverse, "AStar_traverse");
+        WriteMemoryAndTime(totalTime, "AStar_stats");
     }else{
         cout << "FAILED" << '\n';
     }

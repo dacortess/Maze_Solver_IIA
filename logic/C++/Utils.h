@@ -2,11 +2,73 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <chrono>
 
 using namespace std;
 
 #ifndef _UTILS_H
 #define _UTILS_H
+
+#if defined(_WIN32)
+    #include "windows.h"
+#else
+    #include "sys/types.h"
+    #include "sys/sysinfo.h"
+    #include "stdlib.h"
+    #include "stdio.h"
+    #include "string.h"
+    #include "sys/times.h"
+
+    static clock_t lastCPU, lastSysCPU, lastUserCPU;
+    static int numProcessors;
+
+    int parseLine(char* line){
+        // This assumes that a digit will be found and the line ends in " Kb".
+        int i = strlen(line);
+        const char* p = line;
+        while (*p <'0' || *p > '9') p++;
+        line[i-3] = '\0';
+        i = atoi(p);
+        return i;
+    }
+
+    double GetPhysicalMemory(){ //Note: this value is in KB!
+        FILE* file = fopen("/proc/self/status", "r");
+        int result = -1;
+        char line[128];
+
+        while (fgets(line, 128, file) != NULL){
+            if (strncmp(line, "VmRSS:", 6) == 0){
+                result = parseLine(line);
+                break;
+            }
+        }
+        fclose(file);
+        return result;
+    }
+
+    double GetVirtualMemory(){ //Note: this value is in KB!
+        FILE* file = fopen("/proc/self/status", "r");
+        int result = -1;
+        char line[128];
+
+        while (fgets(line, 128, file) != NULL){
+            if (strncmp(line, "VmSize:", 7) == 0){
+                result = parseLine(line);
+                break;
+            }
+        }
+        fclose(file);
+        return result;
+    }
+
+    vector<double> GetMemoryUsage(){
+        vector<double> memory(2);
+        memory[0] = GetVirtualMemory();
+        memory[1] = GetPhysicalMemory();
+        return memory;
+    }
+#endif
 
 class Node{
 public:
@@ -113,5 +175,15 @@ void PrintMap(vector<vector<char>> map){
         }
         cout << '\n';
     }
+}
+
+void WriteMemoryAndTime(int time, string name){
+    vector<double> memory = GetMemoryUsage();
+    ofstream stats;
+    stats.open("output/" + name + ".txt");
+    stats << memory[0] << ' '; //Virutal Memory used in Kb
+    stats << memory[1] << ' '; //Physical Memory used inKb
+    stats << time << '\n'; // Total time in ms
+    stats.close();
 }
 #endif

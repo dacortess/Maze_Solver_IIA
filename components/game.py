@@ -280,23 +280,36 @@ class Game():
         from pygame.display import update as update_display
         from pygame import QUIT, MOUSEBUTTONUP
 
+        # Start window
+
         self.window = self.create_window((800, 600), "Maze Solver")
         self.window.start(self.images.icon)
 
+        # Window config
+
+        self.clock.tick(self.window.fps)
+
+        # Objects config
+
+        BUTTONS_CONFIG = self.get_big_buttons(( ((200,395), "Select Maze"),
+                                                ((600,395), "Upload Maze"))
+                                            )
+
         while self.step >= 0:
+
+            #Mouse position
+
+            MOUSE = mouse_pos() 
+
+            #Blit objects
 
             self.blit_game_title()  
 
-            MOUSE = mouse_pos()     
-
-            BUTTONS = self.blit_buttons(MOUSE, self.get_big_buttons((
-                                                    ((200,395), "Select Maze"),
-                                                    ((600,395), "Upload Maze"))
-                                        ))
+            BUTTONS = self.blit_buttons(MOUSE, BUTTONS_CONFIG)
             
             EXIT_BTN = self.blit_back_button(MOUSE, "Exit")
 
-            self.clock.tick(self.window.fps)
+            #Event handler
 
             for event in event_get():
                 if event.type == QUIT:
@@ -308,7 +321,9 @@ class Game():
                         self.upload_maze()
                     if EXIT_BTN.input_check(MOUSE):
                         self.end_game()
-                    
+            
+            # Update window
+
             update_display()
     
     def select_maze(self) -> None:
@@ -326,52 +341,68 @@ class Game():
         from pygame import QUIT, MOUSEBUTTONUP
         from os.path import abspath, sep, dirname, join
 
+        # Menu state
+
         self.increase_step()
 
-        init_path = sep.join(dirname(abspath(__file__)).split(sep)[:-1])
+        # Objects config
 
-        while self.step >= 1:
+        INFO_TEXT = self.font.info.render("Select the maze to evaluate", True, "White")
+        INFO_RECT = INFO_TEXT.get_rect(center=(400,290))
 
-            self.blit_game_title()
+        CAUTION_TEXT = self.font.info.render("In a maze of size greater than 50, only the solution is shown", True, "White")
+        CAUTION_RECT = CAUTION_TEXT.get_rect(center=(400,325))
 
-            MOUSE = mouse_pos()
-
-            INFO_TEXT = self.font.info.render("Select the maze to evaluate", True, "White")
-            INFO_RECT = INFO_TEXT.get_rect(center=(400,300))
-
-            self.window.blit(INFO_TEXT, INFO_RECT)
-            
-            BUTTONS = self.blit_buttons(MOUSE, self.get_medium_buttons((
-                                                    ((150,400), "Maze 5x5"),
+        BUTTONS_CONFIG = self.get_medium_buttons((  ((150,400), "Maze 5x5"),
                                                     ((150,500), "Maze 10x10"),
                                                     ((400,450), "Maze 50x50"),
                                                     ((650,400), "Maze 100x100"),
                                                     ((650,500), "Maze 400x400"))
-                                        ))
+                                                )
+
+        while self.step >= 1:
+
+            # Mouse positions
+
+            MOUSE = mouse_pos()
+
+            # Blit objects
+
+            self.blit_game_title()
+
+            self.window.blit(INFO_TEXT, INFO_RECT)
+
+            self.window.blit(CAUTION_TEXT, CAUTION_RECT)
+            
+            BUTTONS = self.blit_buttons(MOUSE, BUTTONS_CONFIG)
             
             BACK_BTN = self.blit_back_button(MOUSE)
+
+            # Event handler
 
             for event in event_get():
                 if event.type == QUIT:
                     self.end_game()
                 if event.type == MOUSEBUTTONUP and event.button == 1 and self.step == 1:
                     if BUTTONS[0].input_check(MOUSE):
-                        self.logic.set_maze(join(init_path, 'logic', 'files', 'maze_5x5.csv'))
+                        self.logic.set_maze(join(self.logic.root_path(), 'logic', 'files', 'maze_5x5.csv'))
                         self.select_algorithm()
                     if BUTTONS[1].input_check(MOUSE):
-                        self.logic.set_maze(join(init_path, 'logic', 'files', 'maze_10x10.csv'))
+                        self.logic.set_maze(join(self.logic.root_path(), 'logic', 'files', 'maze_10x10.csv'))
                         self.select_algorithm()
                     if BUTTONS[2].input_check(MOUSE):
-                        self.logic.set_maze(join(init_path, 'logic', 'files', 'maze_50x50.csv'))
+                        self.logic.set_maze(join(self.logic.root_path(), 'logic', 'files', 'maze_50x50.csv'))
                         self.select_algorithm()
                     if BUTTONS[3].input_check(MOUSE):
-                        self.logic.set_maze(join(init_path, 'logic', 'files', 'maze_100x100.csv'))
+                        self.logic.set_maze(join(self.logic.root_path(), 'logic', 'files', 'maze_100x100.csv'))
                         self.select_algorithm()
                     if BUTTONS[4].input_check(MOUSE):
-                        self.logic.set_maze(join(init_path, 'logic', 'files', 'maze_400x400.csv'))
+                        self.logic.set_maze(join(self.logic.root_path(), 'logic', 'files', 'maze_400x400.csv'))
                         self.select_algorithm()
                     if BACK_BTN.input_check(MOUSE):
                         self.decrease_step()
+
+            # Update window
 
             update_display()
     
@@ -389,29 +420,40 @@ class Game():
         from pygame.display import update as update_display
         from pygame import QUIT, MOUSEBUTTONUP
         
+        # Menu state
+
         self.increase_step()
 
-        while self.step >= 2:
+        #Objects config
 
-            self.blit_game_title()
+        INFO_TEXT = self.font.info.render("Select the search algorithm to use", True, "White")
+        INFO_RECT = INFO_TEXT.get_rect(center=(400,300))
 
-            MOUSE = mouse_pos()
-
-            INFO_TEXT = self.font.info.render("Select the search algorithm to use", True, "White")
-            INFO_RECT = INFO_TEXT.get_rect(center=(400,300))
-
-            self.window.blit(INFO_TEXT, INFO_RECT)
-
-            BUTTONS = self.blit_buttons(MOUSE, self.get_medium_buttons((
-                                                    ((150,400), "DFS"),
+        BUTTONS_CONFIG = self.get_medium_buttons((  ((150,400), "DFS"),
                                                     ((150,500), "BFS"),
                                                     ((400,400), "Iterative DFS"),
                                                     ((400,500), "Uniform Cost"),
                                                     ((650,400), "Greedy"),
                                                     ((650,500), "A*"))
-                                        ))
+                                                )
+
+        while self.step >= 2:
+
+            # Mouse position
+
+            MOUSE = mouse_pos()
+
+            # Blit objects
+
+            self.blit_game_title()
+
+            self.window.blit(INFO_TEXT, INFO_RECT)
+
+            BUTTONS = self.blit_buttons(MOUSE, BUTTONS_CONFIG)
             
             BACK_BTN = self.blit_back_button(MOUSE)
+
+            #Event handler
 
             for event in event_get():
                 if event.type == QUIT:
@@ -419,73 +461,26 @@ class Game():
                 if event.type == MOUSEBUTTONUP and event.button == 1 and self.step == 2:
                     if BUTTONS[0].input_check(MOUSE):
                         self.logic.set_algorithm('DFS')
-                        self.set_language()
+                        self.show_maze()
                     if BUTTONS[1].input_check(MOUSE):
                         self.logic.set_algorithm('BFS')
-                        self.set_language()
+                        self.show_maze()
                     if BUTTONS[2].input_check(MOUSE):
                         self.logic.set_algorithm('DLS')
-                        self.set_language()
+                        self.show_maze()
                     if BUTTONS[3].input_check(MOUSE):
                         self.logic.set_algorithm('UCS')
-                        self.set_language()
+                        self.show_maze()
                     if BUTTONS[4].input_check(MOUSE):
                         self.logic.set_algorithm('Greedy')
-                        self.set_language()
+                        self.show_maze()
                     if BUTTONS[5].input_check(MOUSE):
                         self.logic.set_algorithm('AStar')
-                        self.set_language()
-                    if BACK_BTN.input_check(MOUSE):
-                        self.decrease_step()
-
-            update_display()
-
-    def set_language(self) -> None:
-        """
-        Show language selection menu.
-
-        Args: None
-
-        Returns: None
-
-        """
-        from pygame.event import get as event_get
-        from pygame.mouse import get_pos as mouse_pos
-        from pygame.display import update as update_display
-        from pygame import QUIT, MOUSEBUTTONUP
-
-        self.increase_step()
-
-        while self.step >= 3:
-
-            self.blit_game_title()
-
-            MOUSE = mouse_pos()
-
-            INFO_TEXT = self.font.info.render("Select the language to execute the algorithm", True, "White")
-            INFO_RECT = INFO_TEXT.get_rect(center=(400,300))
-
-            self.window.blit(INFO_TEXT, INFO_RECT)
-
-            BUTTONS = self.blit_buttons(MOUSE, self.get_small_buttons((
-                                                    ((300,450), "C++"),
-                                                    ((500,450), "Julia"))
-                                        ))
-            
-            BACK_BTN = self.blit_back_button(MOUSE)
-
-            for event in event_get():
-                if event.type == QUIT:
-                    self.end_game()
-                if event.type == MOUSEBUTTONUP and event.button == 1 and self.step == 3:
-                    if BUTTONS[0].input_check(MOUSE):
-                        self.logic.set_language('C++')
-                        self.show_maze()
-                    if BUTTONS[1].input_check(MOUSE):
-                        self.logic.set_language('Julia')
                         self.show_maze()
                     if BACK_BTN.input_check(MOUSE):
                         self.decrease_step()
+
+            # Update window
 
             update_display()
 
@@ -503,33 +498,46 @@ class Game():
         from pygame.display import update as update_display
         from pygame import QUIT, MOUSEBUTTONUP
 
+        #Menu state
+
         self.increase_step()
 
+        # Objects config
+
+        INFO_TEXT = self.font.info.render("Upload the maze to evaluate", True, "White")
+        INFO_RECT = INFO_TEXT.get_rect(center=(400,300))
+
+        WARNING_TEXT = self.font.info.render("Please select a file", True, "Red")
+        WARNING_RECT = WARNING_TEXT.get_rect(center=(400,335))
+
+        BUTTONS_CONFIG = self.get_big_buttons(( ((400,400), "Click to upload"),
+                                                ((400,500), "Continue"))
+                                            )
+
+        # Objects flags
+
         SHOW_CONTINUE = False
-        WARNING = False
+        SHOW_WARNING = False
 
         while self.step >= 1:
 
-            self.blit_game_title()
+            # Mouse position
 
             MOUSE = mouse_pos()
 
-            INFO_TEXT = self.font.info.render("Upload the maze to evaluate", True, "White")
-            INFO_RECT = INFO_TEXT.get_rect(center=(400,300))
+            # Blit Objects
+
+            self.blit_game_title()
 
             self.window.blit(INFO_TEXT, INFO_RECT)
 
-            BUTTONS = self.blit_buttons(MOUSE, self.get_big_buttons((
-                                                    ((400,400), "Click to upload"),
-                                                    ((400,500), "Continue"))
-                                        ))
+            BUTTONS = self.blit_buttons(MOUSE, BUTTONS_CONFIG)
             
             BACK_BTN = self.blit_back_button(MOUSE)
 
-            if WARNING:
-                WARNING_TEXT = self.font.info.render("Please select a file", True, "Red")
-                WARNING_RECT = WARNING_TEXT.get_rect(center=(400,335))
-                self.window.blit(WARNING_TEXT, WARNING_RECT)
+            if SHOW_WARNING: self.window.blit(WARNING_TEXT, WARNING_RECT)
+
+            # Event handler
 
             for event in event_get():
                 if event.type == QUIT:
@@ -542,12 +550,13 @@ class Game():
                     if BUTTONS[1].input_check(MOUSE):
                         if SHOW_CONTINUE: 
                             self.select_algorithm()
-                            WARNING = False
+                            SHOW_WARNING = False
                         else: 
-                            WARNING = True
-
+                            SHOW_WARNING = True
                     if BACK_BTN.input_check(MOUSE):
                         self.decrease_step()
+
+            # Update window
 
             update_display()
 
@@ -562,12 +571,10 @@ class Game():
         """
         from pygame.display import update as update_display
 
-        self.blit_game_title()
+        # Object config
 
         LOADING_TEXT = self.font.subtitle.render("Loading...", True, "Black")
         LOADING_RECT = LOADING_TEXT.get_rect(center=(400,300))
-
-        self.window.blit(LOADING_TEXT, LOADING_RECT)
 
         INFO_TEXT = self.font.info.render(self.logic.read_copy('loading_copy.txt').format(
                                         language = self.logic.language, algorithm = self.logic.algorithm, 
@@ -575,73 +582,24 @@ class Game():
 
         INFO_RECT = INFO_TEXT.get_rect(center=(400,400))
 
+        # Blit objects
+
+        self.blit_game_title()
+
+        self.window.blit(LOADING_TEXT, LOADING_RECT)
+
         self.window.blit(INFO_TEXT, INFO_RECT)
+
+        # Update window
 
         update_display()
 
+        # Run algorithm
+
         if self.logic.language == 'C++': self.logic.cpp_process()
-        if self.logic.language == 'Julia': self.logic.julia_process()
+        #if self.logic.language == 'Julia': self.logic.julia_process() #Depercated
 
-    def overwindow_maze(self, maze: list, solution: list, actual_cell: list):
-        
-        """
-        Show big maze save menu.
-
-        Args:
-            maze: a List[List[str,...]] with the maze info
-            solution: a List[str,...] with the solution instructions
-            actual_cell: a List[int, int] with the top of search algorithm animation
-
-        Returns: None
-
-        """
-        from pygame.event import get as event_get
-        from pygame.mouse import get_pos as mouse_pos
-        from pygame.display import update as update_display
-        from pygame import QUIT, MOUSEBUTTONUP
-
-        self.increase_step()
-
-        SHOW_CONTINUE = False
-        WARNING = False
-
-        IS_SAVED = False
-
-        while self.step >= 4:
-
-            self.blit_game_title()
-
-            MOUSE = mouse_pos()
-
-            INFO_TEXT = self.font.info.render("Save the image of the maze solution by clicking the following button", True, "White")
-            INFO_RECT = INFO_TEXT.get_rect(center=(400,300))
-
-            WARNING_TEXT = self.font.info.render("Path Saved as img", True, "White")
-            WARNING_RECT = WARNING_TEXT.get_rect(center=(400,500))
-            
-            if IS_SAVED: self.window.blit(WARNING_TEXT, WARNING_RECT)
-
-            self.window.blit(INFO_TEXT, INFO_RECT)
-
-            BUTTONS = self.blit_buttons(MOUSE, self.get_big_buttons((
-                                                    ((200,395), "Save Path"),
-                                                    ((600,395), "Go Home"))
-                                        ))
-
-            for event in event_get():
-                if event.type == QUIT:
-                    self.end_game()
-                if event.type == MOUSEBUTTONUP and event.button == 1 and self.step == 4:
-                    if BUTTONS[0].input_check(MOUSE):
-                        self.save_maze(maze, solution, actual_cell)
-                        IS_SAVED = True
-                    if BUTTONS[1].input_check(MOUSE):
-                        self.decrease_step(max = True)
-
-            update_display()
-
-    def show_maze(self) -> None:
-        
+    def show_maze(self) -> None:   
         """
         Show maze animation.
 
@@ -654,63 +612,99 @@ class Game():
         from pygame.mouse import get_pos as mouse_pos
         from pygame.display import update as update_display
         from pygame import QUIT, MOUSEBUTTONUP
+        from pygame.transform import scale
+
+        # Show load page while algorithm is running
 
         self.loading_page()
 
+        # Menu state
+
+        self.increase_step()
+
+        # Objects config
+
+        CAUTION_TEXT = self.font.info.render("Path Saved as img", True, "White")
+        CAUTION_RECT = CAUTION_TEXT.get_rect(center=(100,300))
+
+        # Objects flags
+
+        IS_SAVED = False
+        IS_COMPLETE = False
+
+        # Read algorithm results
+
         solution = self.logic.open_solution()
-        sstep = 0
 
         traverse = self.logic.open_traverse()
-        tstep = 0
+
+        # Read maze
                 
         maze = self.logic.open_maze()
+
+        # Find start cell
 
         for i in range(len(maze[0])):
             if maze[0][i] == 'c' : 
                 actual_cell = [0,i]
                 break
-        
-        bk_maze = maze.copy()
-        bk_actual_cell = actual_cell.copy()
 
-        if len(maze) > 300:
-            self.overwindow_maze(bk_maze, solution, bk_actual_cell)
-            self.decrease_step(True)
-        else:
-            self.increase_step()
+        # Animation config
 
         TIMING = 75-len(maze)*5
         if TIMING < 0: TIMING = 1
+
         WAIT_TIME = 1
+        
+        sstep = 0
+        tstep = 0
 
-        IS_SAVED = False
-        IS_COMPLETE = False
+        # Screenshot flag
 
-        while self.step >= 4:
+        img = None
 
-            self.blit_background()
+        # Maze and start cell backups for screenshots
+        
+        bk_maze = maze.copy()
+        start_cell = actual_cell.copy()
+
+        while self.step >= 3:
+
+            # Mouse position
 
             MOUSE = mouse_pos()
 
-            WARNING_TEXT = self.font.info.render("Path Saved as img", True, "White")
-            WARNING_RECT = WARNING_TEXT.get_rect(center=(100,300))
+            # Blit objects
+
+            self.blit_background()
             
-            if IS_SAVED: self.window.blit(WARNING_TEXT, WARNING_RECT)
-            
-            HOME_BTN = self.blit_back_button(MOUSE, "Home")
+            if IS_SAVED: self.window.blit(CAUTION_TEXT, CAUTION_RECT)
 
             if IS_COMPLETE: SAVE_BTN = self.blit_save_button(MOUSE)
 
-            self.logic.draw_maze(maze, self.window, 200)
+            HOME_BTN = self.blit_back_button(MOUSE, "Home")
 
-            if WAIT_TIME==TIMING:
+            # Big maze logic
+
+            if len(maze) > 300:
+                if img == None:
+                    self.save_maze(bk_maze, solution, start_cell, save_path=self.logic.root_path())
+                    img = self.logic.path_as_img(len(bk_maze))
+                    IS_COMPLETE = True
+                self.window.blit(scale(img, (600,600)), (200,0))
+            else:
+                self.logic.draw_maze(maze, self.window, 200)
+
+            # Animation Logic
+
+            if WAIT_TIME==TIMING and not IS_COMPLETE:
                 if tstep < len(traverse) and len(maze) <= 50:
-                    maze[traverse[tstep][0]][traverse[tstep][1]] = 't'
+                    maze = self.logic.modify_traverse(maze, traverse, tstep)
                     tstep += 1
                 elif sstep < len(solution):
-                    if sstep == 0: maze[actual_cell[0]][actual_cell[1]] = 's'
+                    if sstep == 0: maze = self.logic.modify_solution(maze, actual_cell)
                     actual_cell = self.logic.set_actual_cell(actual_cell, solution[sstep])
-                    maze[actual_cell[0]][actual_cell[1]] = 's'
+                    maze = self.logic.modify_solution(maze, actual_cell)
                     sstep += 1
                 else:
                     IS_COMPLETE = True
@@ -718,20 +712,24 @@ class Game():
 
             WAIT_TIME += 1
 
+            # Event handler
+
             for event in event_get():
                 if event.type == QUIT:
                     self.end_game()
-                if event.type == MOUSEBUTTONUP and event.button == 1 and self.step == 4:
+                if event.type == MOUSEBUTTONUP and event.button == 1 and self.step == 3:
                     if HOME_BTN.input_check(MOUSE):
                         self.decrease_step(max = True)
                     if IS_COMPLETE:
                         if SAVE_BTN.input_check(MOUSE):
-                            self.save_maze(bk_maze, solution, bk_actual_cell)
+                            self.save_maze(bk_maze, solution, start_cell)
                             IS_SAVED = True
+
+            # Update window
 
             update_display()
         
-    def save_maze(self, maze, solution, actual_cell):
+    def save_maze(self, maze: list, solution: list, actual_cell: list, save_path: str =None):
         """
         Save the maze solution to an image.
 
@@ -747,21 +745,36 @@ class Game():
         from pygame.transform import scale
         from os. path import join
 
+        # Window resolution
+
         size = (len(maze)*2)
 
+        # Window to draw maze with the solution 
+
         new_window = self.create_window((size, size), self.logic.algorithm)
+
+        # Aux vars
+
         sstep = 0
+
+        # Modify maze with the solution
 
         while sstep < len(solution):
             if sstep == 0: maze[actual_cell[0]][actual_cell[1]] = 's'
             actual_cell = self.logic.set_actual_cell(actual_cell, solution[sstep])
             maze[actual_cell[0]][actual_cell[1]] = 's'
             sstep += 1
+
+        # Draw solution
         
         self.logic.draw_maze(maze, new_window, 0)
 
-        save_path = self.logic.open_folder()
+        # Save image
+
+        if save_path == None: save_path = self.logic.open_folder()
         save(scale(new_window.window, (size*10, size*10)), join(save_path, f"solution_with_{self.logic.algorithm}_in_maze_{len(maze)}x{len(maze)}.jpg"))
         
+        # Re-scale window
+
         self.window = self.create_window((800, 600), "Maze Solver")
         self.window.start(self.images.icon)

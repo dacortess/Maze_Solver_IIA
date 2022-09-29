@@ -1,6 +1,6 @@
  # -*- coding: utf-8 -*-
+from pygame import Surface
 from config.window import Window
-
 
 class Logic():
     """ Manage maze solver logic."""
@@ -16,7 +16,7 @@ class Logic():
         """
         self.maze = None
         self.algorithm = None
-        self.language = None
+        self.language = "C++"
     
     # SET SOLVER SETTINGS
 
@@ -67,10 +67,9 @@ class Logic():
             A str with the content of the file
 
         """
-        from os.path import join, sep, dirname, abspath
+        from os.path import join
 
-        init_path = sep.join(dirname(abspath(__file__)).split(sep)[:-1])
-        with open(join(init_path, 'src', 'copys', file_name).replace('\\', '/'), encoding = 'utf-8') as f:
+        with open(join(self.root_path(), 'src', 'copys', file_name).replace('\\', '/'), encoding = 'utf-8') as f:
             file = f.read()
         return file
 
@@ -87,9 +86,7 @@ class Logic():
         """
         import subprocess
         from sys import platform
-        from os.path import join, dirname, abspath, sep
-
-        init_path = sep.join(dirname(abspath(__file__)).split(sep)[:-1])
+        from os.path import join
 
         if platform == 'win32':
             if self.algorithm == 'DLS':
@@ -99,7 +96,7 @@ class Logic():
 
             f = open("windows.bat", "w")
             f.writelines([
-                    f"cd {join(init_path, 'logic', 'C++')}\n",
+                    f"cd {join(self.root_path(), 'logic', 'C++')}\n",
                     script
                     ])
             f.close()
@@ -116,13 +113,12 @@ class Logic():
             f = open("./linux.sh", "w")
             f.writelines([
                     "#!/bin/bash\n",
-                    f"cd {join(init_path, 'logic', 'C++')}\n",
+                    f"cd {join(self.root_path(), 'logic', 'C++')}\n",
                     script
                     ])
             f.close()
             
             subprocess.run(['sh', './linux.sh'])
-
 
     def julia_process(self) -> None:
         """
@@ -137,7 +133,7 @@ class Logic():
         #subprocess.run(["julia", "{script}.jl".format(script=self.algorithm), "{file}".format(file=self.maze)])
         pass
 
-    # UTILS
+    # MAZE LOGIC
 
     def draw_maze(self, maze: list, window: Window, gap: int):
         """
@@ -198,6 +194,71 @@ class Logic():
         else:
             return [actual_cell[0] - 1, actual_cell[1]]
 
+    def path_as_img(self, size: int) -> Surface:
+        """
+        Create a object with the maze and the solution path.
+
+        Args:
+            size: a int with the length of the size
+
+        Returns: a pygame.Surface with the screenshot of the maze with the solution path
+
+        """
+        from pygame.image import load
+        from os.path import join
+        from os import remove
+
+        img = load(join(self.root_path(), f"solution_with_{self.algorithm}_in_maze_{size}x{size}.jpg")).convert()
+        remove(join(self.root_path(), f"solution_with_{self.algorithm}_in_maze_{size}x{size}.jpg"))
+
+        return img
+    
+    def modify_traverse(self, maze, traverse, tstep) -> None:
+        """
+        Modify the maze with the new state of the traverse animation
+
+        Args:
+            maze: a List[List[str,...]] with the maze info
+            traverse: a List[Tuples[int, int]] with the traverse info
+            tstep: a int with the state of the traverse in the animation
+
+        Returns: None
+
+        """
+        maze[traverse[tstep][0]][traverse[tstep][1]] = 't'
+        return maze
+
+    def modify_solution(self, maze, actual_cell) -> None:
+        """
+        Modify the maze with the new state of the solution animation
+
+        Args:
+            maze: a List[List[str,...]] with the maze info
+            solution: a List[str,...] with the traverse info
+            sstep: a int with the state of the solution in the animation
+
+        Returns: None
+
+        """
+        maze[actual_cell[0]][actual_cell[1]] = 's'
+        return maze
+
+    # UTILS
+
+    def root_path(self) -> None:
+        """
+        get the root path.
+
+        Args: None
+
+        Returns:
+            A str with the root path.
+
+        """
+        from os.path import join, sep, dirname, abspath
+
+        return sep.join(dirname(abspath(__file__)).split(sep)[:-1])
+
     def open_maze(self) -> None:
          
         """
@@ -228,10 +289,9 @@ class Logic():
 
         """
 
-        from os.path import join, dirname, abspath, sep
-        init_path = sep.join(dirname(abspath(__file__)).split(sep)[:-1])
+        from os.path import join
 
-        with open(join(init_path, 'logic', f'{self.language}', 'output', 
+        with open(join(self.root_path(), 'logic', f'{self.language}', 'output', 
                         f'{self.algorithm}_traverse.txt'), encoding = 'utf-8') as f:
             file = f.read()
         
@@ -252,10 +312,9 @@ class Logic():
 
         """
 
-        from os.path import join, dirname, abspath, sep
-        init_path = sep.join(dirname(abspath(__file__)).split(sep)[:-1])
+        from os.path import join
 
-        with open(join(init_path, 'logic', f'{self.language}', 'output', 
+        with open(join(self.root_path(), 'logic', f'{self.language}', 'output', 
                         f'{self.algorithm}_path.txt'), encoding = 'utf-8') as f:
             file = f.read()
         

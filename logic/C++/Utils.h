@@ -11,6 +11,19 @@ using namespace std;
 
 #if defined(_WIN32)
     #include "windows.h"
+    #include "psapi.h"
+
+    double GetVirtualMemory(){
+        PROCESS_MEMORY_COUNTERS_EX pmc;
+        GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
+        SIZE_T virtualMemUsedByMe = pmc.PrivateUsage;
+        return virtualMemUsedByMe;
+    }
+
+    double GetPhysicalMemory(){
+        SIZE_T physMemUsedByMe = pmc.WorkingSetSize;
+        return physMemUsedByMe;
+    }
 #else
     #include "sys/types.h"
     #include "sys/sysinfo.h"

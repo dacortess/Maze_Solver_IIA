@@ -112,10 +112,10 @@ int main(int argc, char **argv) {
     start.depth = 0;
     bool failure;
     vector<pair<int,int>> traverse;
-    auto startTime = std::chrono::high_resolution_clock::now();
+    auto startTime = std::chrono::system_clock::now();
     DLSNode fin = IDS(map, traverse, start, end, maxDepth, failure);
-    auto endTime = std::chrono::high_resolution_clock::now();
-    int totalTime = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
+    auto endTime = std::chrono::system_clock::now();
+    double totalTime = std::chrono::duration_cast<std::chrono::nanoseconds>(endTime - startTime).count() / 1000.0;
     if(!failure){
         WriteSolutionPath(fin.path, "DLS_path");
         WriteTraverse(traverse, "DLS_traverse");

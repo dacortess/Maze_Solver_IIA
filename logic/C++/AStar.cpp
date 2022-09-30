@@ -1,3 +1,7 @@
+/**
+ * To compile in Windows use g++ -o AStar AStar.cpp -lpsapi
+ * To compile in Linux use g++ -o AStar AStar.cpp
+ */
 #include <iostream>
 #include <queue>
 #include <vector>

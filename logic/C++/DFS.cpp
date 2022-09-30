@@ -1,3 +1,7 @@
+/**
+ * To compile in Windows use g++ -o DFS DFS.cpp -lpsapi
+ * To compile in Linux use g++ -o DFS DFS.cpp
+ */
 #include <iostream>
 #include <stack>
 #include <vector>

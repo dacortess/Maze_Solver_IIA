@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <chrono>
+#include <cmath>
 
 using namespace std;
 
@@ -26,6 +27,13 @@ using namespace std;
         GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
         SIZE_T physMemUsedByMe = pmc.WorkingSetSize;
         return physMemUsedByMe;
+    }
+
+    vector<double> GetMemoryUsage(){
+        vector<double> memory(2);
+        memory[0] = GetVirtualMemory();
+        memory[1] = GetPhysicalMemory();
+        return memory;
     }
 #else // Else we assume the user is working with Linux/Unix
     #include "sys/types.h"
@@ -269,12 +277,12 @@ void PrintMap(vector<vector<char>> map){
  * @param time Time taken to solve the maze in ms
  * @param name Name of the file to save the memory and time statistics
  */
-void WriteMemoryAndTime(int time, string name){
+void WriteMemoryAndTime(double time, string name){
     vector<double> memory = GetMemoryUsage();
     ofstream stats;
     stats.open("output/" + name + ".txt");
-    stats << memory[0] << ' '; //Virtual Memory used in Kb
-    stats << memory[1] << ' '; //Physical Memory used inKb
+    stats << std::llround(memory[0]) << ' '; //Virtual Memory used in Kb
+    stats << std::llround(memory[1]) << ' '; //Physical Memory used inKb
     stats << time << '\n'; // Total time in ms
     stats.close();
 }

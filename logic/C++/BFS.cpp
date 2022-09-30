@@ -1,3 +1,7 @@
+/**
+ * To compile in Windows use g++ -o BFS BFS.cpp -lpsapi
+ * To compile in Linux use g++ -o BFS BFS.cpp
+ */
 #include <iostream>
 #include <queue>
 #include <vector>

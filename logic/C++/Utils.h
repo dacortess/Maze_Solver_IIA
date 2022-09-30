@@ -9,7 +9,8 @@ using namespace std;
 #ifndef _UTILS_H
 #define _UTILS_H
 
-#if defined(_WIN32)
+// Functions to determine the amount of virtual and phsysical memory used by the current process
+#if defined(_WIN32) // If working on Windows
     #include "windows.h"
     #include "psapi.h"
 
@@ -26,7 +27,7 @@ using namespace std;
         SIZE_T physMemUsedByMe = pmc.WorkingSetSize;
         return physMemUsedByMe;
     }
-#else
+#else // Else we assume the user is working with Linux/Unix
     #include "sys/types.h"
     #include "sys/sysinfo.h"
     #include "stdlib.h"
@@ -85,19 +86,57 @@ using namespace std;
     }
 #endif
 
+/**
+ * @brief Data structure to represent the state of the agent
+ * 
+ */
 class Node{
 public:
+    /**
+     * @brief Path followed to reach the current state. It's given as a sequence of instructions
+     * in char format, namely: 'D'(Down), 'U'(Up), 'L'(Left) and 'D'(Down)
+     * 
+     */
     vector<char> path;
+
+    /**
+     * @brief Current position of the agent in the maze. It's given in x-y coordinates, where the
+     * northwest position of the maze represents the (0,0) coordinate
+     * 
+     */
     pair<int, int> position;
+
+    /**
+     * @brief Construct a new Node object
+     * 
+     * @param x The x coordinate of the agent
+     * @param y The y coordinate of the agent
+     */
     Node(int x = 0, int y = 0) {
         position = make_pair(x, y);
     }
 };
 
+/**
+ * @brief Checks if the agent has reached the target
+ * 
+ * @param map The maze to solve
+ * @param currPosition Current position of the agent in the maze
+ * @param target Position of the target in the maze
+ * @return true If the agent has reached the target, 
+ * @return false otherwise
+ */
 bool IsFinish(vector<vector<char>> map, pair<int, int> currPosition, pair<int, int> target){
     return currPosition == target;
 }
 
+/**
+ * @brief Expands the current node to find its successors
+ * 
+ * @param map Maze to solve
+ * @param current Current node representing the state of the agent
+ * @return vector<Node> with the current node successors
+ */
 vector<Node> Expand(vector<vector<char>>& map, Node current){
     vector<Node> neighbors;
     pair<int, int> currPosition = current.position;
@@ -130,8 +169,15 @@ vector<Node> Expand(vector<vector<char>>& map, Node current){
     return neighbors;
 }
 
-vector<vector<char>> GetMap(string mazeName){
-    ifstream myFile(mazeName);
+/**
+ * @brief Read a the map from a given .csv file and return it as a vector<vector<char>> type
+ * 
+ * @param mazeName The path of the file containing the maze
+ * @return vector<vector<char>> The maze in a 2-dimensional char vector where there's a 'c' for
+ * a cell and a 'w' for a wall
+ */
+vector<vector<char>> GetMap(string mazePath){
+    ifstream myFile(mazePath);
     string line;
     vector<vector<char>> map;
     vector<char> row;
@@ -151,6 +197,13 @@ vector<vector<char>> GetMap(string mazeName){
     return map;
 }
 
+/**
+ * @brief Finds a cell in a row of the maze
+ * 
+ * @param row A row of the maze
+ * @return int - The position where there's a cell 'c'. If not cell is found
+ * it returns 0 and an error message
+ */
 int FindCellIndex(vector<char> row){
     for(int i = 0; i < row.size(); i++){
         if (row[i] == 'c'){
@@ -162,6 +215,13 @@ int FindCellIndex(vector<char> row){
     return 0;
 }
 
+/**
+ * @brief Writes the path found in the maze in a .txt file with the given name
+ * 
+ * @param path Sequence of char instructions(D,U,L,R) representing the path to solve
+ * the maze 
+ * @param name Name of the file to save the path found
+ */
 void WriteSolutionPath(vector<char> path, string name){
     ofstream solutionPath;
     solutionPath.open("output/" + name + ".txt");
@@ -172,6 +232,12 @@ void WriteSolutionPath(vector<char> path, string name){
     solutionPath.close();
 }
 
+/**
+ * @brief Writes the traverse made by the agent to found the path in the maze
+ * 
+ * @param traverse Sequence of x-y coordinates traversed to find the path in the maze 
+ * @param name Name of the file to save the path found
+ */
 void WriteTraverse(vector<pair<int, int>> traverse, string name){
     ofstream traversePath;
     traversePath.open("output/" + name + ".txt");
@@ -182,6 +248,11 @@ void WriteTraverse(vector<pair<int, int>> traverse, string name){
     traversePath.close();
 }
 
+/**
+ * @brief Helper function to print the maze represented as a 2-dimensional char vector
+ * 
+ * @param map 2-dimensional char vector representing the maze
+ */
 void PrintMap(vector<vector<char>> map){
     for(int i = 0; i < map.size(); i++) {
         cout << " ";
@@ -192,11 +263,17 @@ void PrintMap(vector<vector<char>> map){
     }
 }
 
+/**
+ * @brief Writes the VRAM, RAM and execution time used to solve the maze in a .txt file with the given name
+ * 
+ * @param time Time taken to solve the maze in ms
+ * @param name Name of the file to save the memory and time statistics
+ */
 void WriteMemoryAndTime(int time, string name){
     vector<double> memory = GetMemoryUsage();
     ofstream stats;
     stats.open("output/" + name + ".txt");
-    stats << memory[0] << ' '; //Virutal Memory used in Kb
+    stats << memory[0] << ' '; //Virtual Memory used in Kb
     stats << memory[1] << ' '; //Physical Memory used inKb
     stats << time << '\n'; // Total time in ms
     stats.close();

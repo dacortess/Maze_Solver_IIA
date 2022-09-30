@@ -703,8 +703,8 @@ class Game():
 
         # Animation config
 
-        TIMING = 75-len(maze)*5
-        if TIMING < 0: TIMING = 1
+        TIMING = 50-len(maze)*5
+        if TIMING <= 0: TIMING = 1
 
         WAIT_TIME = 1
         

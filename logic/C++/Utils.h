@@ -21,14 +21,14 @@ using namespace std;
         PROCESS_MEMORY_COUNTERS_EX pmc;
         GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
         SIZE_T virtualMemUsedByMe = pmc.PrivateUsage;
-        return virtualMemUsedByMe / 1000.0;
+        return virtualMemUsedByMe / 1000.0; //Kb
     }
 
     double GetPhysicalMemory(){
         PROCESS_MEMORY_COUNTERS_EX pmc;
         GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
         SIZE_T physMemUsedByMe = pmc.WorkingSetSize;
-        return physMemUsedByMe / 1000.0;
+        return physMemUsedByMe / 1000.0;/  //Kb
     }
 
     vector<double> GetMemoryUsage(){

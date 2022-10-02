@@ -187,7 +187,7 @@ int main(int argc, char **argv) {
         fin = IDSWithTree(map, traverse, start, end, maxDepth, failure, tree);
     }
     auto endTime = std::chrono::system_clock::now();
-    int totalTime = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
+    int totalTime = std::chrono::duration_cast<std::chrono::nanoseconds>(endTime - startTime).count();
     if(!failure){
         WriteSolutionPath(fin.path, "DLS_path");
         WriteTraverse(traverse, "DLS_traverse");

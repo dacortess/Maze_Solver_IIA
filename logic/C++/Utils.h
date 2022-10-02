@@ -4,6 +4,8 @@
 #include <string>
 #include <chrono>
 #include <cmath>
+#include <iomanip>
+#include <map>
 
 using namespace std;
 
@@ -19,14 +21,14 @@ using namespace std;
         PROCESS_MEMORY_COUNTERS_EX pmc;
         GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
         SIZE_T virtualMemUsedByMe = pmc.PrivateUsage;
-        return virtualMemUsedByMe;
+        return virtualMemUsedByMe / 1000.0;
     }
 
     double GetPhysicalMemory(){
         PROCESS_MEMORY_COUNTERS_EX pmc;
         GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
         SIZE_T physMemUsedByMe = pmc.WorkingSetSize;
-        return physMemUsedByMe;
+        return physMemUsedByMe / 1000.0;
     }
 
     vector<double> GetMemoryUsage(){
@@ -113,6 +115,8 @@ public:
      * 
      */
     pair<int, int> position;
+
+    int id;
 
     /**
      * @brief Construct a new Node object
@@ -223,6 +227,16 @@ int FindCellIndex(vector<char> row){
     return 0;
 }
 
+void GetTree(vector<int> idsTree, map<int, pair<int, int>> IDs, vector<pair<int, int>>& tree){
+    for(int i = 0; i < idsTree.size(); i++){
+        if ( idsTree[i] == -1){
+            tree.push_back({-1, -1});
+        }else{
+            tree.push_back(IDs[idsTree[i]]);
+        }
+    }
+}
+
 /**
  * @brief Writes the path found in the maze in a .txt file with the given name
  * 
@@ -256,6 +270,20 @@ void WriteTraverse(vector<pair<int, int>> traverse, string name){
     traversePath.close();
 }
 
+void WriteTree(vector<pair<int, int>> tree, string name){
+    ofstream treeFile;
+    treeFile.open("output/" + name + ".txt");
+    for(int i = 0; i < tree.size() - 1; i++){
+        if (tree[i] == make_pair(-1, -1)){
+            treeFile << -1 << " ";
+        }else{
+            treeFile << "(" << tree[i].first << ',' << tree[i].second << ") ";
+        }
+    }
+    treeFile << "(" << tree[tree.size() - 1].first << ',' << tree[tree.size() - 1].second << ")\n";
+    treeFile.close();
+}
+
 /**
  * @brief Helper function to print the maze represented as a 2-dimensional char vector
  * 
@@ -286,4 +314,35 @@ void WriteMemoryAndTime(double time, string name){
     stats << time << '\n'; // Total time in ms
     stats.close();
 }
+
+class Solver{
+    public:
+    Solver(string mazePath, string Name, Node (*solver)(vector<vector<char>>& map, vector<pair<int, int>>& traverse, Node start, Node end, bool& failure), Node (*solverWithTree)(vector<vector<char>>& map, vector<pair<int, int>>& traverse, Node start, Node end, bool& failure, vector<pair<int, int>>& tree)){
+        vector<vector<char>> map = GetMap(mazePath);
+        Node start(0, FindCellIndex(map[0]));
+        Node end(map.size() - 1, FindCellIndex(map[map.size() - 1]));
+        bool failure;
+        vector<pair<int,int>> traverse;
+        vector<pair<int, int>> tree;
+        auto startTime = std::chrono::system_clock::now();
+        Node fin(0,0);
+        if (map.size() > 5){
+            fin = solver(map, traverse, start, end, failure);
+        }else{
+            fin = solverWithTree(map, traverse, start, end, failure, tree);
+        }
+        auto endTime = std::chrono::system_clock::now();
+        double totalTime = std::chrono::duration_cast<std::chrono::nanoseconds>(endTime - startTime).count();
+        if(!failure){
+            WriteSolutionPath(fin.path, Name + "_path");
+            WriteTraverse(traverse, Name + "_traverse");
+            WriteMemoryAndTime(totalTime, Name + "_stats");
+            if (map.size() <= 5){
+                WriteTree(tree, Name + "_tree");
+            }
+        }else{
+            cout << "FAILED" << '\n';
+        }
+    }
+};
 #endif

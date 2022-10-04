@@ -1,31 +1,30 @@
 /**
- * To compile in Windows use g++ -o BFS BFS.cpp -lpsapi
- * To compile in Linux use g++ -o BFS BFS.cpp
+ * To compile in Windows use g++ -o UCS UCS.cpp -lpsapi
+ * To compile in Linux use g++ -o UCS UCS.cpp
  */
 #include <iostream>
-#include <queue>
+#include <stack>
 #include <vector>
 #include <set>
-#include <math.h>
 #include "Utils.h"
 
 using namespace std;
 
-Node BFS(vector<vector<char>>& map, vector<pair<int, int>>& traverse, Node start, Node end, bool& failure){
+Node UCS(vector<vector<char>>& map, vector<pair<int, int>>& traverse, Node start, Node end, bool& failure){
     if (IsFinish(map, start.position, end.position)){
         failure = false;
         return start;
     }
 
-    queue<Node> frontier;
+    stack<Node> frontier;
     frontier.push(start);
     set<pair<int, int>> reached;
     reached.insert(start.position);
     while (!frontier.empty()){
-        Node current = frontier.front();
+        Node current = frontier.top();
         frontier.pop();
         traverse.push_back(current.position);
-        if(IsFinish(map, current.position, end.position)){
+        if (IsFinish(map, current.position, end.position)){
             failure = false;
             return current;
         }
@@ -43,7 +42,7 @@ Node BFS(vector<vector<char>>& map, vector<pair<int, int>>& traverse, Node start
     return start;
 }
 
-Node BFSWithTree(vector<vector<char>>& maze, vector<pair<int, int>>& traverse, Node start, Node end, bool& failure, vector<pair<int, int>>& tree){
+Node UCSWithTree(vector<vector<char>>& maze, vector<pair<int, int>>& traverse, Node start, Node end, bool& failure, vector<pair<int, int>>& tree){
     if (IsFinish(maze, start.position, end.position)){
         failure = false;
         tree.push_back(start.position);
@@ -57,12 +56,12 @@ Node BFSWithTree(vector<vector<char>>& maze, vector<pair<int, int>>& traverse, N
     start.id = 0;
     idsTree[0] = 0;
     int currIndex = 1;
-    queue<Node> frontier;
+    stack<Node> frontier;
     frontier.push(start);
     set<pair<int, int>> reached;
     reached.insert(start.position);
     while (!frontier.empty()){
-        Node current = frontier.front();
+        Node current = frontier.top();
         int fatherIndex = index[current.id];
         frontier.pop();
         traverse.push_back(current.position);
@@ -91,6 +90,6 @@ Node BFSWithTree(vector<vector<char>>& maze, vector<pair<int, int>>& traverse, N
 }
 
 int main(int argc, char **argv) {
-    Solver BFS_Solver(argv[1], "BFS", &BFS, &BFSWithTree);
+    Solver UCS_Solver(argv[1], "UCS", &UCS, &UCSWithTree);
     return 0;
 }

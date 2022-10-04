@@ -1,6 +1,8 @@
 # Maze_Solver_IIA
 
-Maze solver for the "Introduction to Artificial Intelligence" class at the "Universidad Nacional de Colombia".
+Maze solver for the "Introduction to Artificial Intelligence" class at the "Universidad Nacional de Colombia". 
+
+Project video: [here](https://www.youtube.com/watch?v=5vNwhw3XhFg)
 
 # Requirements
   - Python 3.x with:

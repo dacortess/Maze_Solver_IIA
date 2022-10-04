@@ -683,7 +683,7 @@ class Game():
         TIME_TEXT = self.font.info.render("Execution Time:", True, "White")
         TIME_RECT = TIME_TEXT.get_rect(center=(100,530))
 
-        EXTIME_TEXT = self.font.info.render(f"{stats[2]} ms", True, "Grey")
+        EXTIME_TEXT = self.font.info.render(f"{stats[2]} ns", True, "Grey")
         EXTIME_RECT = EXTIME_TEXT.get_rect(center=(100,560))
 
         # Objects flags

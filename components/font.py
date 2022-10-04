@@ -21,6 +21,7 @@ class Font():
         self.subtitle = self.external_font('Adumu.ttf', 30)
         self.text = self.external_font('Adumu.ttf', 20)
         self.info = self.local_font('comicsans', 20)
+        self.mini = self.local_font('comicsans', 10)
 
     def external_font(self, font, size) -> F.Font:
         """

@@ -1,2 +1,2 @@
-cd C:\Users\USUARIO\Documents\GitHub\maze_solver_iia\logic
-.\DLS.exe C:\Users\USUARIO\Documents\GitHub\maze_solver_iia\logic\files\maze_10x10.csv 1000
+cd C:\Users\USUARIO\Documents\GitHub\maze_solver_iia\logic\C++
+.\DFS.exe C:\Users\USUARIO\Documents\GitHub\maze_solver_iia\logic\files\maze_5x5.csv

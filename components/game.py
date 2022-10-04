@@ -648,6 +648,7 @@ class Game():
         from pygame.display import update as update_display
         from pygame import QUIT, MOUSEBUTTONUP
         from pygame.transform import scale
+        from logic.logic import Tree
 
         # Show load page while algorithm is running
 
@@ -670,20 +671,20 @@ class Game():
         CAUTION_TEXT = self.font.info.render("Saved", True, "Green")
         CAUTION_RECT = CAUTION_TEXT.get_rect(center=(100,150))
 
-        MEMORY_TEXT = self.font.info.render("Used Memory:", True, "Grey")
-        MEMORY_RECT = MEMORY_TEXT.get_rect(center=(100,300))
+        MEMORY_TEXT = self.font.info.render("Used Memory:", True, "White")
+        MEMORY_RECT = MEMORY_TEXT.get_rect(center=(100,400))
 
         VRAM_TEXT = self.font.info.render(f"VRAM: {stats[0]} kb", True, "Grey")
-        VRAM_RECT = VRAM_TEXT.get_rect(center=(100,340))
+        VRAM_RECT = VRAM_TEXT.get_rect(center=(100,440))
 
         RAM_TEXT = self.font.info.render(f"RAM: {stats[1]} kb", True, "Grey")
-        RAM_RECT = RAM_TEXT.get_rect(center=(100,380))
+        RAM_RECT = RAM_TEXT.get_rect(center=(100,480))
 
-        TIME_TEXT = self.font.info.render("Execution Time:", True, "Grey")
-        TIME_RECT = TIME_TEXT.get_rect(center=(100,450))
+        TIME_TEXT = self.font.info.render("Execution Time:", True, "White")
+        TIME_RECT = TIME_TEXT.get_rect(center=(100,530))
 
         EXTIME_TEXT = self.font.info.render(f"{stats[2]} ms", True, "Grey")
-        EXTIME_RECT = EXTIME_TEXT.get_rect(center=(100,480))
+        EXTIME_RECT = EXTIME_TEXT.get_rect(center=(100,560))
 
         # Objects flags
 
@@ -719,6 +720,10 @@ class Game():
         
         bk_maze = maze.copy()
         start_cell = actual_cell.copy()
+
+        # Tree
+
+        tree = Tree(self.logic)
 
         while self.step >= 3:
 
@@ -773,6 +778,10 @@ class Game():
                 WAIT_TIME = 0
 
             WAIT_TIME += 1
+
+            # Blit Tree
+
+            if len(maze)<= 6: tree.print_tree(self.window, self.font.mini)
 
             # Event handler
 

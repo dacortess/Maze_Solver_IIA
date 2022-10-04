@@ -362,3 +362,79 @@ class Logic():
         """
         from tkinter import filedialog
         return filedialog.askdirectory()
+
+class Node:
+    def __init__(self, tag, index) -> None:
+        self.index = index
+        self.tag = tag
+        self.childs = []
+    
+    def __str__(self) -> str:
+        return f'Node -> tag: {self.tag}, index: {self.index}'
+
+class Tree:
+    def __init__(self, logic) -> None:
+        self.tree = self.get_tree(logic)
+        self.root = Node(self.tree[0], 0)
+        self.max_childs = 0
+        self.set_tree(self.root)
+    
+    def set_tree(self, father):
+        count = 0
+        for x in range(1,5):
+            try:
+                index = (4*father.index)+x
+                tag = self.tree[index]
+                if tag != '-1':
+                    father.childs.append(Node(tag, index))
+                    count += 1
+            except Exception:
+                pass
+
+        if count >= self.max_childs: self.max_childs = count
+        
+        for child in father.childs:
+            self.set_tree(child)
+    
+    def print_tree(self, window, font):
+        self.print_childs(window, font, [self.root], self.max_childs, 0, None)
+
+    def print_childs(self, window, font, childs, max_childs, level, fcords):
+        from pygame import Rect
+        from pygame.draw import rect as draw_rect, line as draw_line
+
+        nodeSize = int(100/max_childs)
+        
+        for i in range(len(childs)):
+            x_pos, y_pos = (nodeSize-10)+(i*nodeSize), 150+(level*30)
+
+            if fcords != None: draw_line(window.window, "Yellow", (x_pos+15, y_pos+6), fcords)
+
+            rect = Rect(x_pos, y_pos, 30, 15)
+            draw_rect(window.window, "Yellow", rect, 100)
+
+            text = font.render(childs[i].tag, None, "Black")
+            text_rect = text.get_rect(center=(x_pos+15, y_pos+6))
+
+            window.blit(text, text_rect)
+
+            self.print_childs(window, font, childs[i].childs, max_childs, level+1, (x_pos+15, y_pos+6))
+
+    def get_tree(self, logic) -> None:
+        """
+        Read the stats file.
+
+        Args: None
+
+        Returns:
+            A List[str,...] with the solution path
+
+        """
+
+        from os.path import join
+
+        with open(join(logic.root_path(), 'logic', f'{logic.language}', 'output', 
+                        f'{logic.algorithm}_tree.txt'), encoding = 'utf-8') as f:
+            file = f.read()
+
+        return file.split()

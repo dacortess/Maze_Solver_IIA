@@ -781,7 +781,7 @@ class Game():
 
             # Blit Tree
 
-            if len(maze)<= 6: tree.print_tree(self.window, self.font.mini)
+            if len(maze)<= 5: tree.print_tree(self.window, self.font.mini)
 
             # Event handler
 

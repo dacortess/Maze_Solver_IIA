@@ -364,22 +364,54 @@ class Logic():
         return filedialog.askdirectory()
 
 class Node:
+    """ Node class for Tree implementation."""
+
     def __init__(self, tag, index) -> None:
+        """
+        Node constructor.
+
+        Args:
+            tag: a str with the name of node.
+            index: a int that represent the index in the tree array of this node.
+
+        Returns: None
+
+        """
         self.index = index
         self.tag = tag
         self.childs = []
-    
-    def __str__(self) -> str:
-        return f'Node -> tag: {self.tag}, index: {self.index}'
+        self.cords = None
 
 class Tree:
+    """ Control tree prints."""
+
     def __init__(self, logic) -> None:
+        """
+        Node constructor.
+
+        Args:
+            logic: a logic object from components.logic that controlls the game logic.
+
+        Returns: None
+
+        """
         self.tree = self.get_tree(logic)
         self.root = Node(self.tree[0], 0)
         self.max_childs = 0
         self.set_tree(self.root)
     
     def set_tree(self, father):
+        """
+        Transform an array tree to an our tree class implementation.
+        Connect a father node wirh his children.
+
+        Args:
+            father: a Node that represent the fanther node
+
+        Returns: None
+
+        """
+
         count = 0
         for x in range(1,5):
             try:
@@ -397,19 +429,49 @@ class Tree:
             self.set_tree(child)
     
     def print_tree(self, window, font):
+        """
+        Init the function to blit all the tree.
+
+        Args:
+            window: a Pygame.Surface to blit the tree.
+            font: a pygame.font.Font to use for Node tags.
+
+        Returns: None
+
+        """
         self.print_childs(window, font, [self.root], self.max_childs, 0, None)
 
     def print_childs(self, window, font, childs, max_childs, level, fcords):
+        """
+        Blit all the tree.
+
+        Args:
+            window: a Pygame.Surface to blit the tree.
+            font: a pygame.font.Font to use for Node tags.
+            childs: a List[Node, ...] with the nodes to blit.
+            max_childs: a int that represent the max number of nodes in a tree level.
+            level: a int that represent the tree level.
+            fcords: the father cordintates to blit a line with the childs.
+
+        Returns: None
+
+        """
         from pygame import Rect
         from pygame.draw import rect as draw_rect, line as draw_line
 
         nodeSize = int(100/max_childs)
         
         for i in range(len(childs)):
-            x_pos, y_pos = (nodeSize-10)+(i*nodeSize), 150+(level*30)
+            x_pos, y_pos = nodeSize-10, 150+(level*30)
+            if i!=0:
+                x_pos += childs[i-1].cords[0]+10
+                childs[i].cords = (x_pos, y_pos)
+            else:
+                childs[i].cords = (x_pos, y_pos)
 
             if fcords != None: draw_line(window.window, "Yellow", (x_pos+15, y_pos+6), fcords)
 
+            #print(childs[i].tag, " -> ",(x_pos, y_pos))
             rect = Rect(x_pos, y_pos, 30, 15)
             draw_rect(window.window, "Yellow", rect, 100)
 
